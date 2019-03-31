@@ -14,9 +14,11 @@ client.on("guildCreate", guild => {
 client.on("messageReactionAdd", (msgReact, user) => {
     var msg = msgReact.message;
     
-    if (msgReact.emoji.name == '\u26AA') {
+    if (msgReact.emoji.name == '\u26AA' && msgReact.count == 1) {
         msg.react('\u26AA');
-        sendMessage(msg.guild, msg.content + "\r\n\r\nhttps://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id);
+        sendMessage(msg.guild, '<@' + msg.author.id + '>: ' + msg.content + "\r\n\r\nhttps://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id);
+    } else {
+        
     }
 });
 
