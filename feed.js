@@ -4,7 +4,7 @@ const client = new Discord.Client();
 var confToken = 'NTQ5MjEzNTY4NDg3MTI5MDk5.XKFAtQ.TlHAJg0yY3pScK8SMMcDXP42Hwo';
 
 client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+  console.log(`Logged in as ${client.user.tag}. version 2.1!`);
 });
 
 client.on("guildCreate", guild => {
