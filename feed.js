@@ -13,22 +13,25 @@ client.on("guildCreate", guild => {
 
 client.on("messageReactionAdd", (msgReact, user) => {
     var msg = msgReact.message;
-    
-    if (msgReact.emoji.name == '\u26AA' && msgReact.count == 1) {
+    if (msgReact.emoji.name == '\u26AA' && msgReact.count == 1 && user.id != msg.author.id && user.id !== client.user.id) {
         msg.react('\u26AA');
-        sendMessage(msg.guild, '<@' + msg.author.id + '>: ' + msg.content + "\r\n\r\nhttps://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id);
-    } else {
-        
+        msgReact.remove(user);
+        sendEmbed(msg.guild, msg);
     }
 });
 
 client.login(confToken);
 
-function sendMessage(server, message) {
+function sendEmbed(server, msg) {
     for(entry of server.channels) {
         var channel = entry[1];
         if (channel.type == "text" && channel.name == "feed") {
-            channel.send(message);
+            var embed = new Discord.RichEmbed();
+            embed.setAuthor(msg.member.displayName, msg.author.avatarURL);
+            embed.setDescription(msg.content);
+            var url = "https://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id;
+            embed.setTitle('Message in #' + msg.channel.name);
+            channel.send(url, embed);
             return;
         }
     }
