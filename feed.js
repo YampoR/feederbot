@@ -49,8 +49,8 @@ client.on("messageReactionAdd", (msgReact, user) => {
 
 client.on('message', msg => {
     var minlenght = 200;
-    if (msg.channel.name == 'universiteit' && msg.content.length < minlenght && !(msg.content.startsWith('https://') || msg.content.startsWith('http://'))) {
-        msg.author.send('Ik heb je bericht in #universiteit automatisch verwijderd, omdat het onder de minimale berichtlengte van ' + minlenght + ' karakters was.');
+    if (msg.channel.name == 'theorie' && msg.content.length < minlenght && !(msg.content.startsWith('https://') || msg.content.startsWith('http://'))) {
+        msg.author.send('Ik heb je bericht in #theorie automatisch verwijderd, omdat het onder de minimale berichtlengte van ' + minlenght + ' karakters was.');
         msg.delete();
     }
 });
