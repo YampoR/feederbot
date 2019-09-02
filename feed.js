@@ -108,6 +108,7 @@ client.on("message", (message) => {
                     let channel = message.guild.channels.get(channels[userID]);
                     if (typeof channel == 'undefined') {
                         buf += '# ' + channels[userID] + ' undefined\n';
+                        continue;
                     }
                     buf += member.displayName + ': ' + channel.name + "\n";
                     if (buf.length > 1800) {
@@ -116,7 +117,7 @@ client.on("message", (message) => {
                     }
                 }
                 message.author.send(buf).catch(console.log);                
-            });
+            }).catch(console.log);
         });
     }
     
