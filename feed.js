@@ -5,7 +5,7 @@ const request = require("request");
 var confToken = 'NTQ5MjEzNTY4NDg3MTI5MDk5.XKFAtQ.TlHAJg0yY3pScK8SMMcDXP42Hwo';
 const KameraadRoleId = '506183228206481428';
 const CategorieId = '616400159483363338';
-const PrivateChannelWelcomeMessage = 'Welkom in je eigen kanaal, {mention}. Je kunt mensen toe voegen door het kanaal te bewerken en dan op Machtigingen te klikken. Kijk in de gepinde berichten in <#617717752958025728> voor meer informatie.';
+const PrivateChannelWelcomeMessage = 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen door het kanaal te bewerken en dan op Machtigingen te klikken. Kijk in de gepinde berichten in <#617717752958025728> voor meer informatie.';
 
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}. version 2.1!`);
@@ -61,6 +61,26 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
     createMemberChannel(newMember);
 });
 
+var updatingChannels = [];
+client.on("channelUpdate", async (oldChannel, newChannel) => {
+    if (updatingChannels.indexOf(newChannel.id) > -1)
+        return;
+    
+    if (channelIsInZelfOrganisatie(newChannel)) {
+        // @everyone permissions zijn fixed:
+        
+        // Kameraden role mag niet gebruikt worden
+        if (newChannel.permissionOverwrites.has(KameraadRoleId)) {
+            await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);
+        }
+        
+        // Oranje rol mag niet gebruikt worden
+        if (newChannel.permissionOverwrites.has('511945889502461964')) {
+            await newChannel.permissionOverwrites.get('511945889502461964').delete().catch(console.log);
+        }
+    }
+});
+
 client.on("message", (message) => {
     if (!message.guild)
         return;
@@ -77,13 +97,13 @@ client.on("message", (message) => {
     
     if (command == "/create_channels") {
         if (args[0] == 'IAmVerySure') {
-            getMembersWithChannels(function(userIDs) {
+            getMembersWithChannels(async function(userIDs) {
                 let nSkip = 0;
                 let nDo = 0;
                 for(member of message.guild.roles.get(KameraadRoleId).members.array()) {
                     // Create channel for members without channel
                     if (userIDs.indexOf(member.user.id) == -1) {
-                        createMemberChannel(member);
+                        await createMemberChannel(member);
                         nDo++;
                     } else
                         nSkip++;
@@ -93,6 +113,34 @@ client.on("message", (message) => {
         } else {
             message.author.send('Are you sure you want to create a new channel for everyone without their own channel? If so, type **/create_channels IAmVerySure** in the server you want to execute this command in.');
         }
+    }
+    
+    else if (command == "/cleanup_db") {
+        getMemberChannels(function(channels) {
+            message.guild.fetchMembers().then(function() {
+                let nCleanupM = 0;
+                let nCleanupC = 0;
+                for(userID in channels) {
+                    let hasMember = message.guild.members.has(userID);
+                    if (!hasMember) {
+                        request.post('https://www.hettuig.nl/bot/delete_channel.php', {
+                            form: { 'user' : userID }
+                        });
+                        nCleanupM++;
+                        continue;
+                    }
+                    let hasChannel = message.guild.channels.has(channels[userID]);
+                    if (!hasChannel) {
+                        request.post('https://www.hettuig.nl/bot/delete_channel.php', {
+                            form: { 'channel' : channels[userID] }
+                        });
+                        nCleanupC++;
+                        continue;
+                    }
+                }
+                message.author.send('Cleaned up ' + nCleanupM + ' members, ' + nCleanupC + ' channels').catch(console.log);
+            }).catch(console.log);
+        });
     }
     
     else if (command == "/get_known_channels") {
@@ -202,7 +250,11 @@ function createMemberChannel(member) {
             }
         ]
     }).then(function(ch) {
-        ch.send(PrivateChannelWelcomeMessage.replace('{mention}', '<@' + member.user.id + '>'))
+        ch.send(
+            PrivateChannelWelcomeMessage
+            .replace('{mention}', '<@' + member.user.id + '>')
+            .replace('{username}', member.displayName)
+        )
         .catch(console.log);
         
         request.post('https://www.hettuig.nl/bot/save_channel.php', {
@@ -220,6 +272,12 @@ client.on('message', msg => {
         msg.author.send('Ik heb je bericht in #theorie automatisch verwijderd, omdat het onder de minimale berichtlengte van ' + minlenght + ' karakters was.');
         msg.delete();
     }
+});
+
+client.on('channelDelete', (channel) => {
+    request.post('https://www.hettuig.nl/bot/delete_channel.php', {
+        form: { 'channel': channel.id }
+    });
 });
 
 client.login(confToken);
