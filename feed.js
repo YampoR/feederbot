@@ -102,10 +102,13 @@ client.on("message", (message) => {
                 for(userID in channels) {
                     let member = message.guild.members.get(userID);
                     if (typeof member == 'undefined') {
-                        buf += userID + ' undefined\n';
+                        buf += '@ ' + userID + ' undefined\n';
                         continue;
                     }
                     let channel = message.guild.channels.get(channels[userID]);
+                    if (typeof channel == 'undefined') {
+                        buf += '# ' + channels[userID] + ' undefined\n';
+                    }
                     buf += member.displayName + ': ' + channel.name + "\n";
                     if (buf.length > 1800) {
                         message.author.send(buf).catch(console.log);
