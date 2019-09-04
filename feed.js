@@ -62,20 +62,18 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
     createMemberChannel(newMember);
 });
 
-var updatingChannels = [];
+var updatingChannels = {};
 client.on("channelUpdate", async (oldChannel, newChannel) => {
-    if (updatingChannels.indexOf(newChannel.id) > -1)
+    if (updatingChannels[newChannel.id])
         return;
-    
+	
     if (channelIsInZelfOrganisatie(newChannel)) {
+    
+        updatingChannels[newChannel.id] = true;
+        
         // @everyone permissions zijn fixed:
-        if (newChannel.permissionOverwrites.has(newChannel.guild.id)) {
-            let overwrites = newChannel.permissionOverwrites.get(newChannel.guild.id);
-            if (overwrites.allow != 0 || overwrites.deny != Discord.Permissions.FLAGS.VIEW_CHANNEL) {
-                await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
-	    }
-        }
-	    
+        await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
+        
         // Kameraden role mag niet gebruikt worden
         if (newChannel.permissionOverwrites.has(KameraadRoleId)) {
             await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);
@@ -85,6 +83,8 @@ client.on("channelUpdate", async (oldChannel, newChannel) => {
         if (newChannel.permissionOverwrites.has('511945889502461964')) {
             await newChannel.permissionOverwrites.get('511945889502461964').delete().catch(console.log);
         }
+        
+        delete updatingChannels[newChannel.id];
     }
 });
 
