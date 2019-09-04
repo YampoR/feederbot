@@ -70,7 +70,7 @@ client.on("channelUpdate", async (oldChannel, newChannel) => {
     if (channelIsInZelfOrganisatie(newChannel)) {
         // @everyone permissions zijn fixed:
         if (newChannel.permissionOverwrites.has(newChannel.guild.id)) {
-		    await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);	
+		    await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
 	    }
 	    
         // Kameraden role mag niet gebruikt worden
