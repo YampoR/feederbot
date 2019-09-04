@@ -300,7 +300,7 @@ function isBotAdmin(member) {
 
 function sendEmbed(server, msg, pinner) {
     let channel = server.channels.get(FeedChId);
-    if (typeof channel != 'undefined') {
+    if (typeof channel == 'undefined') {
 	    console.log("COULDNT FIND #feed (" + client.guilds.get(serverId).name + ")");
         return;
     }
