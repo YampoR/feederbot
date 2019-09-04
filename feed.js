@@ -69,7 +69,10 @@ client.on("channelUpdate", async (oldChannel, newChannel) => {
     
     if (channelIsInZelfOrganisatie(newChannel)) {
         // @everyone permissions zijn fixed:
-        
+        if (newChannel.permissionOverwrites.has(newChannel.guild.id)) {
+		    await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);	
+	    }
+	    
         // Kameraden role mag niet gebruikt worden
         if (newChannel.permissionOverwrites.has(KameraadRoleId)) {
             await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);
@@ -298,7 +301,7 @@ function isBotAdmin(member) {
 function sendEmbed(server, msg, pinner) {
     let channel = server.channels.get(FeedChId);
     if (typeof channel != 'undefined') {
-	    console.log("COULDNT FIND #feed IN " + serverId + " (" + client.guilds.get(serverId).name + ")");
+	    console.log("COULDNT FIND #feed (" + client.guilds.get(serverId).name + ")");
         return;
     }
     var embed = new Discord.RichEmbed();
