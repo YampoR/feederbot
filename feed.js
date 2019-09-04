@@ -5,6 +5,7 @@ const request = require("request");
 var confToken = 'NTQ5MjEzNTY4NDg3MTI5MDk5.XKFAtQ.TlHAJg0yY3pScK8SMMcDXP42Hwo';
 const KameraadRoleId = '506183228206481428';
 const CategorieId = '616400159483363338';
+const FeedChId = '562042082408005642';
 const PrivateChannelWelcomeMessage = 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen door het kanaal te bewerken en dan op Machtigingen te klikken. Kijk in de gepinde berichten in <#617717752958025728> voor meer informatie.';
 
 client.once("ready", () => {
@@ -295,17 +296,16 @@ function isBotAdmin(member) {
 }
 
 function sendEmbed(server, msg, pinner) {
-    for(entry of server.channels) {
-        var channel = entry[1];
-        if (channel.type == "text" && channel.name == "feed") {
-            var embed = new Discord.RichEmbed();
-            embed.setAuthor(msg.member.displayName, msg.author.avatarURL);
-            embed.setDescription(msg.content);
-            var url = "https://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id;
-            embed.setTitle('Message in #' + msg.channel.name + ' pinned by ' + pinner);
-            channel.send(url, embed);
-            return;
-        }
+    let channel = server.channels.get(FeedChId);
+    if (typeof channel != 'undefined') {
+	    console.log("COULDNT FIND #feed IN " + serverId + " (" + client.guilds.get(serverId).name + ")");
+        return;
     }
-    console.log("COULDNT FIND #feed IN " + serverId + " (" + client.guilds.get(serverId).name + ")");
+    var embed = new Discord.RichEmbed();
+    embed.setAuthor(msg.member.displayName, msg.author.avatarURL);
+    embed.setDescription(msg.content);
+    embed.setTitle('Message in #' + msg.channel.name + ' pinned by ' + pinner);
+    
+    var url = "https://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id;
+    channel.send(url, embed);
 }
