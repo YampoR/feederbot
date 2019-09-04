@@ -72,7 +72,8 @@ client.on("channelUpdate", async (oldChannel, newChannel) => {
         updatingChannels[newChannel.id] = true;
         
         // @everyone permissions zijn fixed:
-        await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
+        await newChannel.overwritePermissions(client.user.id, {'VIEW_CHANNEL':true,'MANAGE_ROLES':true,'MANAGE_CHANNEL':true,'SEND_MESSAGES':true}).catch(console.log);
+	await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
         
         // Kameraden role mag niet gebruikt worden
         if (newChannel.permissionOverwrites.has(KameraadRoleId)) {
@@ -253,7 +254,7 @@ function createMemberChannel(member) {
             },
             {
                 id: member.guild.me.user.id,
-                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES']
+                allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS']
             }
         ]
     }).then(function(ch) {
