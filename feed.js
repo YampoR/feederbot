@@ -66,25 +66,45 @@ var updatingChannels = {};
 client.on("channelUpdate", async (oldChannel, newChannel) => {
     if (updatingChannels[newChannel.id])
         return;
-	
+
     if (channelIsInZelfOrganisatie(newChannel)) {
-    
+
         updatingChannels[newChannel.id] = true;
-        
+
         // @everyone permissions zijn fixed:
         await newChannel.overwritePermissions(client.user.id, {'VIEW_CHANNEL':true,'MANAGE_ROLES':true,'MANAGE_CHANNEL':true,'SEND_MESSAGES':true}).catch(console.log);
 	await newChannel.overwritePermissions(newChannel.guild.id, {'VIEW_CHANNEL':false}).catch(console.log);
-        
-        // Kameraden role mag niet gebruikt worden
+
+        // kameraden role mag niet gebruikt worden
         if (newChannel.permissionOverwrites.has(KameraadRoleId)) {
             await newChannel.permissionOverwrites.get(KameraadRoleId).delete().catch(console.log);
         }
-        
-        // Oranje rol mag niet gebruikt worden
+
+        // Conservatieven rol mag niet gebruikt worden
         if (newChannel.permissionOverwrites.has('511945889502461964')) {
             await newChannel.permissionOverwrites.get('511945889502461964').delete().catch(console.log);
         }
-        
+
+        // Liberalen rol mag niet gebruikt worden
+        if (newChannel.permissionOverwrites.has('621446143812960277')) {
+            await newChannel.permissionOverwrites.get('621446143812960277').delete().catch(console.log);
+        }
+
+        // Brocialisten rol mag niet gebruikt
+        if (newChannel.permissionOverwrites.has('621446162200789013')) {
+            await newChannel.permissionOverwrites.get('621446162200789013').delete().catch(console.log);
+        }
+
+        // Teller rol mag niet gebruikt
+        if (newChannel.permissionOverwrites.has('621446162200789013')) {
+            await newChannel.permissionOverwrites.get('621446162200789013').delete().catch(console.log);
+        }
+
+        // Roller rol mag niet gebruikt
+        if (newChannel.permissionOverwrites.has('621448632629067779')) {
+            await newChannel.permissionOverwrites.get('621448632629067779').delete().catch(console.log);
+        }
+
         delete updatingChannels[newChannel.id];
     }
 });
@@ -92,17 +112,17 @@ client.on("channelUpdate", async (oldChannel, newChannel) => {
 client.on("message", (message) => {
     if (!message.guild)
         return;
-    
+
     if (!isBotAdmin(message.member))
         return;
-    
+
     if (!message.content.startsWith("/")) {
         return;
     }
-    
+
     let args = message.content.split(/\s+/);
     let command = args.shift();
-    
+
     if (command == "/create_channels") {
         if (args[0] == 'IAmVerySure') {
             getMembersWithChannels(async function(userIDs) {
@@ -122,7 +142,7 @@ client.on("message", (message) => {
             message.author.send('Are you sure you want to create a new channel for everyone without their own channel? If so, type **/create_channels IAmVerySure** in the server you want to execute this command in.');
         }
     }
-    
+
     else if (command == "/cleanup_db") {
         getMemberChannels(function(channels) {
             message.guild.fetchMembers().then(function() {
@@ -150,7 +170,7 @@ client.on("message", (message) => {
             }).catch(console.log);
         });
     }
-    
+
     else if (command == "/get_known_channels") {
         getMemberChannels(function(channels) {
             message.guild.fetchMembers().then(function() {
@@ -172,11 +192,11 @@ client.on("message", (message) => {
                         buf = '';
                     }
                 }
-                message.author.send(buf).catch(console.log);                
+                message.author.send(buf).catch(console.log);
             }).catch(console.log);
         });
     }
-    
+
     else if (command == "/member_has_channel") {
         if (!args.length) {
             message.channel.send('Use /member_has_channel <@User>');
@@ -187,7 +207,7 @@ client.on("message", (message) => {
             message.author.send("Member " + member.user.username + " has " + (has ? 'a' : 'no') + ' channel.');
         });
     }
-    
+
     else if (command == "/create_channel_for") {
         let args = message.content.split(/\s+/);
         args.shift();
@@ -198,10 +218,10 @@ client.on("message", (message) => {
         let member = message.mentions.members.first();
         createMemberChannel(member);
     }
-    
+
     // Unknown command
     else return;
-    
+
     message.delete().catch(console.log);
 });
 
@@ -264,7 +284,7 @@ function createMemberChannel(member) {
             .replace('{username}', member.displayName)
         )
         .catch(console.log);
-        
+
         request.post('https://www.hettuig.nl/bot/save_channel.php', {
             form: {
                 'user': member.user.id,
@@ -312,7 +332,7 @@ function sendEmbed(server, msg, pinner) {
     embed.setAuthor(msg.member.displayName, msg.author.avatarURL);
     embed.setDescription(msg.content);
     embed.setTitle('Message in #' + msg.channel.name + ' pinned by ' + pinner);
-    
+
     var url = "https://discordapp.com/channels/" + msg.guild.id + "/" + msg.channel.id + "/" + msg.id;
     channel.send(url, embed);
 }
