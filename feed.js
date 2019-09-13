@@ -1,6 +1,6 @@
 // Configuration
 const Configuration = {
-    
+
     General: {
         BotToken: 'NTQ5MjEzNTY4NDg3MTI5MDk5.XKFAtQ.TlHAJg0yY3pScK8SMMcDXP42Hwo',
         LogChannelId: '617405248587169798',
@@ -8,7 +8,7 @@ const Configuration = {
             '146312749146701824' // @Xesau#1681
         ]
     },
-    
+
     Feed: {
         Enabled: true,
         Channels: {
@@ -22,29 +22,29 @@ const Configuration = {
             '513002607439118336', // #polemiek / #oranje
         ]
     },
-    
+
     MessageRestrictions: {
         Enabled: true,
         Messages: {
             MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
-            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal. Als je bericht te lang is, splits die dan op in meerdere stukken.',
+            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal.',
             TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal. Splits het op in meerdere stukken.',
             ContainsUrl: 'Je bericht bevat een link, wat niet toegestaan is in dit kanaal.'
         },
         Channels: {
             // #theorie
-            '527123966020550666': { 
+            '527123966020550666': {
                 MinLength: 200,
                 ExceptUrls: true
             }
         }
     },
-    
+
     Commands: {
         Prefix: '!'
     },
-    
+
     Zelforganisatie: {
         ApiUrl: 'https://www.hettuig.nl/bot',
         Enabled: true,
@@ -70,7 +70,7 @@ const Configuration = {
             '511945889502461964', // Conservatieven
             '621446143812960277', // Liberalen
             '621446162200789013', // Brocialisten
-            
+
         ],
         WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen met !add @[persoon] en verwijderen met !remove @[persoon]. Zie #618422819298082829 voor meer informatie.'
     }
@@ -83,7 +83,7 @@ const client = new Discord.Client();
 
 // Patcher
 let Patcher = {
-    
+
     enableOldReactionListeners: function(client) {
         client.on("raw", async event => {
             let events = {
@@ -107,9 +107,9 @@ let Patcher = {
             }
 
             client.emit(events[event.t], reaction, user);
-        });        
+        });
     }
-    
+
 };
 
 // Feed
@@ -119,54 +119,54 @@ let Feed = {
         client.on("messageReactionAdd", (reaction, user) => {
             var message = reaction.message;
             var channel = message.channel;
-            
+
             // If it was already feeded, skip
             if (reaction.users.has(client.user.id))
                 return;
-            
+
             // Ignore own reactions
             // TODO: TEST if redundant after previous
             if (user.id == client.user.id)
                 return;
-            
+
             // Blocked channels & categories
             if (Configuration.Feed.BlockedChannels.indexOf(channel.id) > -1
              || (channel.parent && Configuration.Feed.BlockedChannels.indexOf(channel.parent.id) > -1))
                 return;
-            
+
             // If blocked, Don't FEED your own messages
             if (!Configuration.Feed.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
                 return;
-            
+
             // Check if reaction means anything
             if (!(reaction.emoji.name in Configuration.Feed.Channels))
                 return;
-            
+
             let feedChannelId = Configuration.Feed.Channels[reaction.emoji.name];
             let feedChannel = message.guild.channels.get(feedChannelId);
             if (typeof feedChannel == 'undefined') {
                 errorHandler('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
                 return;
             }
-            
+
             message.react(reaction.emoji).catch(errorHandler);
             reaction.remove(user).catch(errorHandler);
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
                 .setTitle('Message in #' + channel.name + ' pinned by ' + user.username);
-            
+
             feedChannel.send(message.url, embed).catch(errorHandler);
             errorHandler('Pinned message by ' + message.author + ' in ' + message.channel);
         });
     }
-    
+
 }
 
 // Commands
 let Commands = {
     commands: {},
-    
+
     enable(client) {
         client.on("message", (message) => {
             if (!message.guild)
@@ -175,16 +175,16 @@ let Commands = {
             if (!message.content.startsWith(Configuration.Commands.Prefix))
                 return;
 
-            let fullCommand = message.content.substring(Configuration.Commands.Prefix.length);            
+            let fullCommand = message.content.substring(Configuration.Commands.Prefix.length);
             let args = fullCommand.split(/\s+/);
             let command = args.shift();
             if (!(command in Commands.commands))
                 return;
-            
+
             Commands.commands[command](message.guild, message.member, command, args, message);
         });
     },
-    
+
     addCommand(commandName, handler) {
         Commands.commands[commandName] = handler;
     }
@@ -194,18 +194,18 @@ let Commands = {
 client.on("message", (message) => {
     if (!message.guild)
         return;
-    
+
     if (!isBotAdmin(message.member))
         return;
-    
+
     if (!message.content.startsWith("/")) {
         return;
     }
-    
+
     let args = message.content.split(/\s+/);
     let command = args.shift();
     let guild = message.guild;
-    
+
     // if (command == "/create_channels") {
         // if (args[0] == 'IAmVerySure') {
             // Zelforganisatie.Database.getUsers(async function(userIDs) {
@@ -226,7 +226,7 @@ client.on("message", (message) => {
             // message.author.send('Are you sure you want to create a new channel for everyone without their own channel? If so, type **/create_channels IAmVerySure** in the server you want to execute this command in.');
         // }
     // }
-    
+
     // else
         if (command == "/set_default_permissions") {
         if (!args) {
@@ -235,7 +235,7 @@ client.on("message", (message) => {
         let ch = guild.channels.get(args[0]);
         Zelforganisatie.setDefaultPermissions(ch);
     }
-    
+
     // else if (command == "/member_has_channel") {
         // if (!args.length) {
             // message.channel.send('Use /member_has_channel <@User>');
@@ -246,30 +246,30 @@ client.on("message", (message) => {
             // message.author.send("Member " + member.user.username + " has " + (has ? 'a' : 'no') + ' channel.');
         // });
     // }
-    
+
     // Unknown command
     else return;
-    
+
     message.delete().catch(errorHandler);
 });
 
 // Zelforganisatie
 let Zelforganisatie = {
-    
+
     updatingChannels: {},
-    
+
     isChannelPublic(channel) {
         if (!Configuration.Zelforganisatie.PublicAccessRoleId)
             return false;
-        
+
         let overwrite = channel.permissionOverwrites.get(Configuration.Zelforganisatie.PublicAccessRoleId);
         if (!overwrite)
             return false;
-        
+
         let permissions = new Discord.Permissions(overwrite.allow);
         return permissions.has('VIEW_CHANNEL');
     },
-    
+
     enable(client, commands) {
         // Register event listeners
         client.on('channelDelete', (channel) => {
@@ -288,7 +288,7 @@ let Zelforganisatie = {
                     Zelforganisatie.createChannel(newMember);
             }));
         });
-        
+
         // Register commands
         commands.addCommand('add', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
@@ -304,11 +304,11 @@ let Zelforganisatie = {
                 }
                 channel.overwritePermissions(addMember, {
                     'VIEW_CHANNEL': true,
-                    'SEND_MESSAGES': true
-                    'EMBED_LINKS': true
-                    'ATTACH_FILES': true
-                    'USE_EXTERNAL_EMOJIS': true
-                    'ADD_REACTIONS': true
+                    'SEND_MESSAGES': true,
+                    'EMBED_LINKS': true,
+                    'ATTACH_FILES': true,
+                    'USE_EXTERNAL_EMOJIS': true,
+                    'ADD_REACTIONS': true,
                     'READ_MESSAGE_HISTORY': true
                 });
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
@@ -343,7 +343,7 @@ let Zelforganisatie = {
                 // }
                 // let channel = g.channels.get(channelId);
                 // if (a.length == 1 && a[1] == 'IAmVerySure') {
-                    
+
                 // } else
                     // u.send('Typ !reset IAmVerySure om je kanaal te resetten.').catch(errorHandler);
                 // return true;
@@ -353,18 +353,18 @@ let Zelforganisatie = {
             let subcommand = a.shift();
             if (!isBotAdmin(u))
                 return;
-            
+
             // Help
             if (!subcommand) {
                 u.send('**!zelforganisatie**\n' +
-                    '- !zelforganisatie create @member: Kanaal maken voor member\n' + 
+                    '- !zelforganisatie create @member: Kanaal maken voor member\n' +
                     '- !zelforganisatie createAll: Kanaal maken voor iedereen met nodige rol zonder kanaal\n' +
                     '- !zelforganisatie channels [all|public]: Lijst met gebruikers en hun kanalen\n' +
                     '- !zelforganisatie cleanup: Database opschonen'
                 ).catch(errorHandler);
                 return true;
             }
-            
+
             // /zelforganisatie assign
             if (subcommand == 'assign') {
                 if (a.length != 2) {
@@ -377,7 +377,7 @@ let Zelforganisatie = {
                 Zelforganisatie.Database.setUserChannel(a[0], a[1]);
                 return true;
             }
-            
+
             // /zelforganisatie cleanup
             if (subcommand == 'cleanup') {
                 Zelforganisatie.Database.getChannels(function(channels) {
@@ -399,7 +399,7 @@ let Zelforganisatie = {
                 });
                 return true;
             }
-            
+
             // /zelforganisatie create @member
             if (subcommand == 'create') {
                 if (!a.length) {
@@ -410,13 +410,13 @@ let Zelforganisatie = {
                 Zelforganisatie.createChannel(newMember);
                 return true;
             }
-            
+
             // /zelforganisatie channels
             if (subcommand == 'channels') {
                 let publicOnly = a.length && a[0] == 'public';
                 Zelforganisatie.Database.getChannels(function(channels) {
                     g.fetchMembers().then(function() {
-                        let buf = '**Lijst van ' + (publicOnly ? 'publieke ' : '') + 
+                        let buf = '**Lijst van ' + (publicOnly ? 'publieke ' : '') +
                             'zelforganisatie-kanalen:**\n';
                         for(userID in channels) {
                             let member = g.members.get(userID);
@@ -433,22 +433,22 @@ let Zelforganisatie = {
                                 buf = '';
                             }
                         }
-                        u.send(buf).catch(errorHandler);                
+                        u.send(buf).catch(errorHandler);
                     }).catch(errorHandler);
                 });
             }
-            
+
             return false;
         });
     },
-    
+
     async setDefaultPermissions(ch) {
         if (!ch.parent || !(Configuration.Zelforganisatie.CategoryIds.indexOf(ch.parent.id) > -1))
             return;
-        
+
         if (Zelforganisatie.updatingChannels[ch.id])
             return;
-        
+
         // Stop listening for this channel
         Zelforganisatie.updatingChannels[ch.id] = true;
 
@@ -465,21 +465,21 @@ let Zelforganisatie = {
                 perms[perm] = true;
             for (perm in denied.serialize())
                 perms[perm] = false;
-            
+
             ch.overwritePermissions(entry[0], perms);
         }
-        
+
         // Remove illegal permission overwrites
         for (let id of Configuration.Zelforganisatie.BannedOverwriteIds) {
             if (ch.permissionOverwrites.has(id)) {
                 await ch.permissionOverwrites.get(id).delete().catch(errorHandler);
             }
         }
-        
+
         // Start listening again
         delete Zelforganisatie.updatingChannels[ch.id];
     },
-    
+
     createChannel(member) {
         let newChannelName = member.user.username.toLowerCase().replace(/[^a-z]+/g, '-');
         let parentId = -1;
@@ -494,7 +494,7 @@ let Zelforganisatie = {
             errorHandler('Could not find Zelforganisatie category with less than 50 channels for ' + member);
             return;
         }
-        
+
         member.guild.createChannel(newChannelName, {
             type: 'TEXT',
             parent: parentId,
@@ -519,36 +519,36 @@ let Zelforganisatie = {
                 .replace('{username}', member.displayName)
             )
             .catch(errorHandler);
-            
+
             Zelforganisatie.Database.setUserChannel(member.id, ch.id);
         }).catch(errorHandler);
     },
-    
+
     Database: {
         setUserChannel(userId, channelId) {
             request.post(Configuration.Zelforganisatie.ApiUrl + '/save_channel.php', {
                 form: { 'user': userId, 'channel': channelId }
             });
         },
-        
+
         getUserChannel(userId, callback) {
             request.get(Configuration.Zelforganisatie.ApiUrl + '/channels.json', function(e, s, b) {
                 callback(JSON.parse(b)[userId]);
             });
         },
-        
+
         deleteUserChannel(userId) {
             request.post(Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php', {
                 form: { 'user': userId }
             });
         },
-        
+
         deleteChannel(channelId) {
             request.post(Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php', {
                 form: { 'channel': channelId }
             });
         },
-        
+
         userHasChannel(userId, callback) {
             request.get(Configuration.Zelforganisatie.ApiUrl + '/has_channel.php?user=' + member.user.id, function(e, s, b) {
                 callback(b.toUpperCase() == 'TRUE');
@@ -560,29 +560,29 @@ let Zelforganisatie = {
                 callback(JSON.parse(b));
             });
         },
-        
+
         getUsers(callback) {
             request.get(Configuration.Zelforganisatie.ApiUrl + '/users_with_channels.php', function(e, s, b) {
                 let userIDs = b.split(/\s+/);
                 callback(userIDs);
             });
         }
-    }   
+    }
 }
 
 // Message Restrictions
 let MessageRestrictions = {
-    
+
     enable(client) {
         client.on('message', msg => {
             let restrictions = Configuration.MessageRestrictions.Channels[msg.channel.id];
             if (typeof restrictions == 'undefined')
                 return;
-            
+
             // URL message exceptions
             if (restrictions.ExceptUrls && msg.content.match(/^https?:\/\//))
                 return;
-            
+
             let violations = [];
             if (restrictions.MinLength && msg.content.length < restrictions.MinLength)
                 violations.push('TooShort');
@@ -590,14 +590,14 @@ let MessageRestrictions = {
                 violations.push('TooLong');
             if (restrictions.BlockUrls && msg.content.match(/https?:\/\//))
                 violations.push('ContainsUrl');
-            
+
             if (violations.lenght == 0)
                 return;
-            
+
             let messageBuffer = Configuration.MessageRestrictions.Messages.MessageDeleted;
             for (violation of violations) {
-                messageBuffer += 
-                    "\n" + 
+                messageBuffer +=
+                    "\n" +
                     Configuration.MessageRestrictions.Messages.ListIcon +
                     Configuration.MessageRestrictions.Messages[violation]
                         .replace('{length}', message.content.length)
@@ -618,7 +618,7 @@ function errorHandler() {
         console.log(arguments);
         return;
     }
-    
+
     let ch = client.channels.get(Configuration.General.LogChannelId);
     if (typeof ch == 'undefined') {
         console.log('COULD NOT FIND LOG CHANNEL');
