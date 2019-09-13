@@ -12,7 +12,8 @@ const Configuration = {
     Feed: {
         Enabled: true,
         Channels: {
-            '\u26AA': '562042082408005642' // :white_circle: -> #feed
+            '\u26AA': '562042082408005642', // :white_circle: -> #feed
+            '\u1F534': '508676723273891840' // :red_circle: -> #burgerwacht
         },
         AllowOwnMessages: false,
         BlockedChannels: [
@@ -154,10 +155,10 @@ let Feed = {
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
-                .setTitle('Bericht in #' + channel.name + ' gefeed door ' + user.username);
+                .setTitle('Bericht in #' + channel.name + ' verstuurd door ' + user.username);
 
             feedChannel.send(message.url, embed).catch(errorHandler);
-            errorHandler('Gefeed door ' + message.author + ' in ' + message.channel);
+            errorHandler('Verstuurd door ' + message.author + ' in ' + message.channel);
         });
     }
 
