@@ -343,7 +343,13 @@ let Zelforganisatie = {
                 return true;
             }
             Zelforganisatie.Database.getChannels((channels) => {
-                for(channelId of channels) {
+                console.log(channels);
+                for(userId in channels) {
+                    if (userId == u.id) {
+                        u.send('Je kunt je eigen kanaal ' + channel + ' niet verlaten.').catch(errorHandler);
+                        return;
+                    }
+                    let channelId = channels[userId];
                     if (channelId == channel.id) {
                         channel.overwritePermissions(u.id, {
                             'VIEW_CHANNEL': false
