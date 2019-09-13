@@ -39,7 +39,7 @@ const Configuration = {
         Messages: {
             MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
-            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal. Als je bericht langer is, splits die dan in meerdere stukken.',
+            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal.',
             TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal. Splits het op in meerdere stukken.',
             ContainsUrl: 'Je bericht bevat een link, wat niet toegestaan is in dit kanaal.'
         },
@@ -165,10 +165,10 @@ let Feed = {
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
-                .setTitle('Bericht in #' + channel.name + ' gefeed door ' + user.username);
+                .setTitle('Message in #' + channel.name + ' pinned by ' + user.username);
 
             feedChannel.send(message.url, embed).catch(errorHandler);
-            errorHandler('Gefeed door ' + message.author + ' in ' + message.channel);
+            errorHandler('Pinned message by ' + message.author + ' in ' + message.channel);
         });
     }
 
@@ -192,22 +192,22 @@ let Report = {
                 return;
 
             // Blocked channels & categories
-            if (Configuration.Report.BlockedChannels.indexOf(channel.id) > -1
-             || (channel.parent && Configuration.Report.BlockedChannels.indexOf(channel.parent.id) > -1))
+            if (Configuration.Feed.BlockedChannels.indexOf(channel.id) > -1
+             || (channel.parent && Configuration.Feed.BlockedChannels.indexOf(channel.parent.id) > -1))
                 return;
 
             // If blocked, Don't report your own messages
-            if (!Configuration.Report.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
+            if (!Configuration.Feed.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
                 return;
 
             // Check if reaction means anything
-            if (!(reaction.emoji.name in Configuration.Report.Channels))
+            if (!(reaction.emoji.name in Configuration.Feed.Channels))
                 return;
 
-            let reportChannelId = Configuration.Report.Channels[reaction.emoji.name];
-            let reportChannel = message.guild.channels.get(reportChannelId);
-            if (typeof reportChannel == 'undefined') {
-                errorHandler('Report channel for ' + reaction.emoji.name + ' invalid (#' + reportChannelId + ')');
+            let feedChannelId = Configuration.Feed.Channels[reaction.emoji.name];
+            let feedChannel = message.guild.channels.get(feedChannelId);
+            if (typeof feedChannel == 'undefined') {
+                errorHandler('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
                 return;
             }
 
@@ -216,10 +216,10 @@ let Report = {
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
-                .setTitle('Bericht in #' + channel.name + ' aangegeven door ' + user.username);
+                .setTitle('Message in #' + channel.name + ' pinned by ' + user.username);
 
-            reportChannel.send(message.url, embed).catch(errorHandler);
-            errorHandler('Aangegeven door ' + message.author + ' in ' + message.channel);
+            feedChannel.send(message.url, embed).catch(errorHandler);
+            errorHandler('Pinned message by ' + message.author + ' in ' + message.channel);
         });
     }
 
@@ -703,10 +703,7 @@ if (Configuration.Zelforganisatie.Enabled)
     Zelforganisatie.enable(client, Commands);
 if (Configuration.Feed.Enabled) {
     Patcher.enableOldReactionListeners(client);
-    Report.enable(client);
-if (Configuration.Report.Enabled) {
-        Patcher.enableOldReactionListeners(client);
-        Report.enable(client);
+    Feed.enable(client);
 }
 
 // Run!
