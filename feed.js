@@ -298,7 +298,6 @@ let Zelforganisatie = {
                     return true;
                 }
                 let channel = g.channels.get(channelId);
-                let addRole = m.mentions.roles();
                 let addMember = m.mentions.users.first();
                 if (typeof addMember == 'undefined') {
                     u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker').catch(errorHandler);
