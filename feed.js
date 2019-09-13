@@ -530,7 +530,7 @@ let Zelforganisatie = {
             permissionOverwrites: [
                 {
                     id: member.guild.id,
-                    deny: ['MANAGE_WEBHOOKS', 'SEND_TTS_MESSAGES', 'MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_CHANNELS', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'ADD_REACTIONS']
+                    deny: ['MANAGE_MESSAGES', 'MANAGE_WEBHOOKS', 'SEND_TTS_MESSAGES', 'MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_CHANNELS', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'ADD_REACTIONS']
                 },
                 {
                     id: member.user.id,
@@ -539,7 +539,8 @@ let Zelforganisatie = {
                 },
                 {
                     id: member.guild.me.user.id,
-                    allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'MANAGE_CHANNELS', 'ADD_REACTIONS', 'READ_MESSAGE_HISTORY']
+                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES', 'MANAGE_WEBHOOKS'],
+                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
                 }
             ]
         }).then(function(ch) {
