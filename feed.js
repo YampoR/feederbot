@@ -73,7 +73,7 @@ const Configuration = {
             '621446162200789013', // Brocialisten
 
         ],
-        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen met !add @[persoon] en verwijderen met !remove @[persoon]. Zie #618422819298082829 voor meer informatie.'
+        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
     }
 }
 
