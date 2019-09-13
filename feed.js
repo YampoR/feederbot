@@ -12,7 +12,8 @@ const Configuration = {
     Feed: {
         Enabled: true,
         Channels: {
-            '\u26AA': '562042082408005642' // :white_circle: -> #feed
+            '\u26AA': '562042082408005642', // :white_circle: -> #feed
+            '\uD83D': '508676723273891840' // :red_circle: -> #Burgerwacht
         },
         AllowOwnMessages: false,
         BlockedChannels: [
