@@ -298,6 +298,7 @@ let Zelforganisatie = {
                     return true;
                 }
                 let channel = g.channels.get(channelId);
+                let addRole = m.mentions.roles.first();
                 let addMember = m.mentions.users.first();
                 if (typeof addMember == 'undefined') {
                     u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker').catch(errorHandler);
@@ -312,6 +313,7 @@ let Zelforganisatie = {
                     'ADD_REACTIONS': true,
                     'READ_MESSAGE_HISTORY': true,
                     'MENTION_EVERYONE': false,
+                    'MANAGE_WEBHOOKS': false,
                     'CREATE_INSTANT_INVITE': false
                 });
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
@@ -534,12 +536,12 @@ let Zelforganisatie = {
                 },
                 {
                     id: member.user.id,
-                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES', 'MANAGE_WEBHOOKS'],
-                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
+                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
+                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_WEBHOOKS']
                 },
                 {
                     id: member.guild.me.user.id,
-                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES', 'MANAGE_WEBHOOKS'],
+                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
                     deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
                 }
             ]
