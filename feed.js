@@ -310,8 +310,8 @@ let Zelforganisatie = {
                     'ATTACH_FILES': true,
                     'USE_EXTERNAL_EMOJIS': true,
                     'ADD_REACTIONS': true,
-                    'READ_MESSAGE_HISTORY': true
-                    'MENTION_EVERYONE': false
+                    'READ_MESSAGE_HISTORY': true,
+                    'MENTION_EVERYONE': false,
                     'CREATE_INSTANT_INVITE': false
                 });
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
