@@ -12,14 +12,24 @@ const Configuration = {
     Feed: {
         Enabled: true,
         Channels: {
-            '\u26AA': '562042082408005642', // :white_circle: -> #feed
-            '\uD83D': '508676723273891840' // :red_circle: -> #Burgerwacht
+            '\u26AA': '562042082408005642' // :white_circle: -> #feed
         },
         AllowOwnMessages: false,
         BlockedChannels: [
             '527123966020550666', // #theorie
             '618226503347470336', // Zelforganisatie I
             '616400159483363338', // Zelforganisatie II
+            '513002607439118336', // #polemiek / #oranje
+        ]
+    },
+
+    Report: {
+        Enabled: true,
+        Channels: {
+            '\uD83D': '508676723273891840' // :red_circle: -> #Burgerwacht
+        },
+        AllowOwnMessages: false,
+        BlockedChannels: [
             '513002607439118336', // #polemiek / #oranje
         ]
     },
@@ -136,6 +146,57 @@ let Feed = {
                 return;
 
             // If blocked, Don't FEED your own messages
+            if (!Configuration.Feed.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
+                return;
+
+            // Check if reaction means anything
+            if (!(reaction.emoji.name in Configuration.Feed.Channels))
+                return;
+
+            let feedChannelId = Configuration.Feed.Channels[reaction.emoji.name];
+            let feedChannel = message.guild.channels.get(feedChannelId);
+            if (typeof feedChannel == 'undefined') {
+                errorHandler('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
+                return;
+            }
+
+            message.react(reaction.emoji).catch(errorHandler);
+            reaction.remove(user).catch(errorHandler);
+            var embed = new Discord.RichEmbed()
+                .setAuthor(message.member.displayName, message.author.avatarURL)
+                .setDescription(message.content)
+                .setTitle('Message in #' + channel.name + ' pinned by ' + user.username);
+
+            feedChannel.send(message.url, embed).catch(errorHandler);
+            errorHandler('Pinned message by ' + message.author + ' in ' + message.channel);
+        });
+    }
+
+}
+
+// report
+let Report = {
+
+    enable(client) {
+        client.on("messageReactionAdd", (reaction, user) => {
+            var message = reaction.message;
+            var channel = message.channel;
+
+            // If it was already reported, skip
+            if (reaction.users.has(client.user.id))
+                return;
+
+            // Ignore own reactions
+            // TODO: TEST if redundant after previous
+            if (user.id == client.user.id)
+                return;
+
+            // Blocked channels & categories
+            if (Configuration.Feed.BlockedChannels.indexOf(channel.id) > -1
+             || (channel.parent && Configuration.Feed.BlockedChannels.indexOf(channel.parent.id) > -1))
+                return;
+
+            // If blocked, Don't report your own messages
             if (!Configuration.Feed.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
                 return;
 
