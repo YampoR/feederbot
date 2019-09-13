@@ -73,7 +73,7 @@ const Configuration = {
             '621446162200789013', // Brocialisten
 
         ],
-        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
+        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toevoegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
     }
 }
 
@@ -311,6 +311,8 @@ let Zelforganisatie = {
                     'USE_EXTERNAL_EMOJIS': true,
                     'ADD_REACTIONS': true,
                     'READ_MESSAGE_HISTORY': true
+                    'MENTION_EVERYONE': false
+                    'CREATE_INSTANT_INVITE': false
                 });
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
                 return true;
@@ -528,11 +530,12 @@ let Zelforganisatie = {
             permissionOverwrites: [
                 {
                     id: member.guild.id,
-                    deny: ['VIEW_CHANNEL']
+                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS']
                 },
                 {
                     id: member.user.id,
-                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES']
+                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS'],
+                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
                 },
                 {
                     id: member.guild.me.user.id,
