@@ -331,7 +331,7 @@ let Zelforganisatie = {
                 channel.overwritePermissions(removeMember, {
                     'VIEW_CHANNEL': false,
                     'SEND_MESSAGES': false
-                });
+                }).catch(errorHandler);
                 u.send('Je hebt ' + removeMember + ' verwijderd uit ' + channel).catch(errorHandler);
                 return true;
             });
