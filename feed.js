@@ -28,8 +28,8 @@ const Configuration = {
         Messages: {
             MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
-            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal.',
-            TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal.',
+            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal. Als je bericht te lang is, splits die dan op in meerdere stukken.',
+            TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal. Splits het op in meerdere stukken.',
             ContainsUrl: 'Je bericht bevat een link, wat niet toegestaan is in dit kanaal.'
         },
         Channels: {
@@ -72,7 +72,7 @@ const Configuration = {
             '621446162200789013', // Brocialisten
             
         ],
-        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen door het kanaal te bewerken en dan op Machtigingen te klikken. Kijk in de gepinde berichten in <#617717752958025728> voor meer informatie.'
+        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toe voegen met !add @[persoon] en verwijderen met !remove @[persoon]. Zie #618422819298082829 voor meer informatie.'
     }
 }
 
@@ -293,7 +293,7 @@ let Zelforganisatie = {
         commands.addCommand('add', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je hebt geen eigen kanaal waar je mensen aan toe kunt voegen.').catch(errorHandler);
+                    u.send('Je kunt kameraden alleen toevoegen aan je eigen kanaal.').catch(errorHandler);
                     return true;
                 }
                 let channel = g.channels.get(channelId);
@@ -305,6 +305,11 @@ let Zelforganisatie = {
                 channel.overwritePermissions(addMember, {
                     'VIEW_CHANNEL': true,
                     'SEND_MESSAGES': true
+                    'EMBED_LINKS': true
+                    'ATTACH_FILES': true
+                    'USE_EXTERNAL_EMOJIS': true
+                    'ADD_REACTIONS': true
+                    'READ_MESSAGE_HISTORY': true
                 });
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
                 return true;
@@ -313,7 +318,7 @@ let Zelforganisatie = {
         commands.addCommand('remove', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je hebt geen eigen kanaal waar je mensen aan toe kunt voegen.').catch(errorHandler);
+                    u.send('Je kunt kameraden alleen verwijderen uit je eigen kanaal.').catch(errorHandler);
                     return true;
                 }
                 let channel = g.channels.get(channelId);
