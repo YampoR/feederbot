@@ -336,6 +336,26 @@ let Zelforganisatie = {
                 return true;
             });
         });
+        commands.addCommand('leave', (g, u, c, a, m) => {
+            let channel = m.mentions.channels.first();
+            if (typeof channel == 'undefined') {
+                u.send('Gebruik: !leave #kanaal').catch(errorHandler);
+                return true;
+            }
+            Zelforganisatie.Database.getChannels((channels) => {
+                for(channelId of channels) {
+                    if (channelId == channel.id) {
+                        channel.overwritePermissions(u.id, {
+                            'VIEW_CHANNEL': false
+                        });
+                        u.send('Je hebt het kanaal ' + channel + ' verlaten.').catch(errorHandler);
+                        return;
+                    }
+                }
+                u.send('Je kunt het kanaal ' + channel + ' niet verlaten.').catch(errorHandler);
+            });
+            return true;
+        });
         // commands.addCommand('reset', (g, u, c, a, m) => {
             // Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 // if (typeof channelId == 'undefined') {
