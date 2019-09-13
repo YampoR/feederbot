@@ -13,7 +13,7 @@ const Configuration = {
         Enabled: true,
         Channels: {
             '\u26AA': '562042082408005642', // :white_circle: -> #feed
-            '\u1F534': '508676723273891840' // :red_circle: -> #burgerwacht
+            '\uD83D': '508676723273891840' // :red_circle: -> #burgerwacht
         },
         AllowOwnMessages: false,
         BlockedChannels: [
