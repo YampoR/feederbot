@@ -669,7 +669,7 @@ function errorHandler() {
         console.log(new Error().stack);
         return;
     }
-    ch.send('Console output @ ' + new Date().toUTCString() + ':\n```' + JSON.stringify(Array.from(arguments)) + '```\nat```'+(new Error().stack)+'```).catch(console.log);
+    ch.send('Console output @ ' + new Date().toUTCString() + ':\n```' + JSON.stringify(Array.from(arguments)) + '```\nat```'+(new Error().stack)+'```').catch(console.log);
     console.log.apply(console, arguments);
     console.log(new Error().stack);
 }
