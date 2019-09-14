@@ -4,6 +4,7 @@ const Configuration = {
     General: {
         BotToken: 'NTQ5MjEzNTY4NDg3MTI5MDk5.XKFAtQ.TlHAJg0yY3pScK8SMMcDXP42Hwo',
         LogChannelId: '617405248587169798',
+        LogStackLines: 5,
         Developers: [
             '146312749146701824' // @Xesau#1681
         ]
@@ -661,7 +662,14 @@ function isBotAdmin(member) {
 function errorCatcher() {
     let stack = new Error().stack;
     let firstNewLine = stack.indexOf('\n');
-    stack = stack.substring(firstNewLine, 450)+'...';
+    let toLine = firstNewLine;
+    for(let i = 0; i < Configuration.General.LogStackLines; i++) {
+        let toLinePossible = stack.indexOf('\n', toLine + 1);
+        if (toLinePossible == -1)
+            break;
+        toLine = toLinePossible;
+    }
+    stack = stack.substring(firstNewLine + 1, toLine);
     return function() {
         let arrayArgs = Array.from(arguments);
         arrayArgs.push(stack);
