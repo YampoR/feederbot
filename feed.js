@@ -660,6 +660,8 @@ function isBotAdmin(member) {
 
 function errorCatcher() {
     let stack = new Error().stack;
+    let firstNewLine = stack.indexOf('\n');
+    stack = stack.substring(firstNewLine, 450)+'...';
     return function() {
         let arrayArgs = Array.from(arguments);
         arrayArgs.push(stack);
@@ -669,7 +671,7 @@ function errorCatcher() {
                 ch.send(
                     'Console output @ ' + new Date().toUTCString() + ':\n```' + 
                     JSON.stringify(Array.from(arguments)) +
-                    '```\nat```'+stack+'```'
+                    '\n\n'+stack+'```'
                 ).catch(console.log);
             } else {
                 Configuration.General.LogChannelId = false;
