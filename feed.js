@@ -189,70 +189,7 @@ let Commands = {
     addCommand(commandName, handler) {
         Commands.commands[commandName] = handler;
     }
-}
-
-// Old command system
-client.on("message", (message) => {
-    if (!message.guild)
-        return;
-
-    if (!isBotAdmin(message.member))
-        return;
-
-    if (!message.content.startsWith("/")) {
-        return;
-    }
-
-    let args = message.content.split(/\s+/);
-    let command = args.shift();
-    let guild = message.guild;
-
-    // if (command == "/create_channels") {
-        // if (args[0] == 'IAmVerySure') {
-            // Zelforganisatie.Database.getUsers(async function(userIDs) {
-                // let nSkip = 0;
-                // let nDo = 0;
-                // let role = guild.roles.get(KameraadRoleId);
-                // for(member of role.members.array()) {
-                    // // Create channel for members without channel
-                    // if (userIDs.indexOf(member.user.id) == -1) {
-                        // await Zelforganisatie.createChannel(member);
-                        // nDo++;
-                    // } else
-                        // nSkip++;
-                // }
-                // message.author.send("Created channels for " + nDo + " " + role.name + " members, skipped for " + nSkip + " members").catch(errorHandler);
-            // });
-        // } else {
-            // message.author.send('Are you sure you want to create a new channel for everyone without their own channel? If so, type **/create_channels IAmVerySure** in the server you want to execute this command in.');
-        // }
-    // }
-
-    // else
-        if (command == "/set_default_permissions") {
-        if (!args) {
-            return;
-        }
-        let ch = guild.channels.get(args[0]);
-        Zelforganisatie.setDefaultPermissions(ch);
-    }
-
-    // else if (command == "/member_has_channel") {
-        // if (!args.length) {
-            // message.channel.send('Use /member_has_channel <@User>');
-            // message.delete();
-        // }
-        // let member = message.mentions.members.first();
-        // Zelforganisatie.Database.userHasChannel(member.id, function(has) {
-            // message.author.send("Member " + member.user.username + " has " + (has ? 'a' : 'no') + ' channel.');
-        // });
-    // }
-
-    // Unknown command
-    else return;
-
-    message.delete().catch(errorHandler);
-});
+};
 
 // Zelforganisatie
 let Zelforganisatie = {
@@ -298,12 +235,20 @@ let Zelforganisatie = {
                     return true;
                 }
                 let channel = g.channels.get(channelId);
+                let overwriteId;
+                
                 let addMember = m.mentions.users.first();
-                if (typeof addMember == 'undefined') {
-                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker').catch(errorHandler);
+                let addRole = m.mentions.roles.first();
+                if (typeof addMember != 'undefined') {
+                    overwriteId = addMember.id;
+                } else if (typeof addRole != 'undefined') {
+                    overwriteId = addRole.id;
+                } else {
+                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker of ' + Configuration.Commands.Prefix + 'add @rol').catch(errorHandler);
                     return true;
                 }
-                channel.overwritePermissions(addMember, {
+                
+                channel.overwritePermissions(overwriteId, {
                     'VIEW_CHANNEL': true,
                     'SEND_MESSAGES': true,
                     'EMBED_LINKS': true,
@@ -326,12 +271,20 @@ let Zelforganisatie = {
                     return true;
                 }
                 let channel = g.channels.get(channelId);
+                let overwriteId;
+                
                 let removeMember = m.mentions.users.first();
-                if (typeof removeMember == 'undefined') {
-                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'remove @gebruiker').catch(errorHandler);
+                let removeRole = m.mentions.roles.first();
+                if (typeof removeMember != 'undefined') {
+                    overwriteId = removeMember.id;
+                } else if (typeof removeRole != 'undefined') {
+                    overwriteId = removeRole.id;
+                } else {
+                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'remove @gebruiker of ' + Configuration.Commands.Prefix + 'remove @rol').catch(errorHandler);
                     return true;
                 }
-                channel.overwritePermissions(removeMember, {
+                
+                channel.overwritePermissions(overwriteId, {
                     'VIEW_CHANNEL': false,
                     'SEND_MESSAGES': false
                 }).catch(errorHandler);
@@ -390,12 +343,14 @@ let Zelforganisatie = {
                     '- !zelforganisatie create @member: Kanaal maken voor member\n' +
                     '- !zelforganisatie createAll: Kanaal maken voor iedereen met nodige rol zonder kanaal\n' +
                     '- !zelforganisatie channels [all|public]: Lijst met gebruikers en hun kanalen\n' +
+                    '- !zelforganisatie assign memberId kanaalId: Gebruiker eigenaar van kanaal maken\n' +
+                    '- !zelforganisatie whois #kanaal: Eigenaar van kanaal weergeven\n' +
                     '- !zelforganisatie cleanup: Database opschonen'
                 ).catch(errorHandler);
                 return true;
             }
 
-            // /zelforganisatie assign
+            // !zelforganisatie assign
             if (subcommand == 'assign') {
                 if (a.length != 2) {
                     u.send('Syntax: !zelforganisatie assign <userId> <channelId>');
@@ -407,8 +362,30 @@ let Zelforganisatie = {
                 Zelforganisatie.Database.setUserChannel(a[0], a[1]);
                 return true;
             }
+            
+            // !zelforganisatie whois
+            if (subcommand == 'whois') {
+                if (a.length != 1) {
+                    u.send('Syntax: !zelforganisatie whois #kanaal').catch(errorHandler);
+                    return true;
+                }
+                let channel = m.mentions.channels.first();
+                if (typeof channel == 'undefined') {
+                    u.send('Kanaal niet gevonden').catch(errorHandler);
+                    return true;
+                } 
+                Zelforganisatie.Database.getChannels((channels) => {
+                    for(let userId in channels) {
+                        let channelId = channels[userId];
+                        if (channelId == channel.id) {
+                            u.send('Kanaal ' + channel + ' is van ' + g.members.get(userId)).catch(errorHandler);
+                            break;
+                        }
+                    }
+                });
+            }
 
-            // /zelforganisatie cleanup
+            // !zelforganisatie cleanup
             if (subcommand == 'cleanup') {
                 Zelforganisatie.Database.getChannels(function(channels) {
                     g.fetchMembers().then(function() {
@@ -430,7 +407,7 @@ let Zelforganisatie = {
                 return true;
             }
 
-            // /zelforganisatie create @member
+            // !zelforganisatie create @member
             if (subcommand == 'create') {
                 if (!a.length) {
                     u.send('Use /zelforganisatie create @User');
@@ -440,8 +417,31 @@ let Zelforganisatie = {
                 Zelforganisatie.createChannel(newMember);
                 return true;
             }
+            
+            if (subcommand == 'createAll') {
+                Zelforganisatie.Database.getUsers(async function(userIDs) {
+                    let nSkip = 0;
+                    let nDo = 0;
+                    let doIt = a.length == 1 && a[0] == 'IAmVerySure';
+                    let role = guild.roles.get(KameraadRoleId);
+                    for(member of role.members.array()) {
+                        // Create channel for members without channel
+                        if (userIDs.indexOf(member.user.id) > -1) {
+                            nSkip++;
+                            continue;
+                        }
+                        nDo++;
+                        if (doIt)
+                            await Zelforganisatie.createChannel(member);
+                    }
+                    if (doIt)
+                        u.send(nDo + " kanalen aangemaakt voor " + role.name + ", " + nSkip + " hadden al een kanaal.").catch(errorHandler);
+                    else
+                        u.send('Weet je zeker dat je ' + nDo + ' kanalen wil aanmaken? Typ dan **!zelforganisatie createAll IAmVerySure**').catch(errorHandler);
+                });
+            }
 
-            // /zelforganisatie channels
+            // !zelforganisatie channels
             if (subcommand == 'channels') {
                 let publicOnly = a.length && a[0] == 'public';
                 Zelforganisatie.Database.getChannels(function(channels) {
