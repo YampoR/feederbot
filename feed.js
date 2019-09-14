@@ -318,7 +318,7 @@ let Zelforganisatie = {
             });
             return true;
         });
-        commands.addCommand('reset', (g, u, c, a, m) => {
+        commands.addCommand('reset', async (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
                     u.send('Je hebt geen eigen kanaal wat je kunt resetten.').catch(errorCatcher());
@@ -326,7 +326,7 @@ let Zelforganisatie = {
                 }
                 let channel = g.channels.get(channelId);
                 if (a.length == 1 && a[0] == 'IAmVerySure') {
-                    Zelforganisatie.Database.deleteUserChannel(u.id, () => {
+                    Zelforganisatie.Database.deleteUserChannel(u.id, async () => {
                          await channel.delete().catch(errorCatcher()); 
                          Zelforganisatie.createChannel(m.member);
                          u.send('Je kanaal is gereset.').catch(errorCatcher());
