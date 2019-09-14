@@ -424,7 +424,7 @@ let Zelforganisatie = {
                     let nSkip = 0;
                     let nDo = 0;
                     let doIt = a.length == 1 && a[0] == 'IAmVerySure';
-                    let role = g.roles.get(Configuratie.RequiredRoleId);
+                    let role = g.roles.get(Configuration.RequiredRoleId);
                     for(let member of role.members.array()) {
                         // Create channel for members without channel
                         if (userIDs.indexOf(member.user.id) > -1) {
@@ -438,7 +438,7 @@ let Zelforganisatie = {
                     if (doIt)
                         u.send(nDo + " kanalen aangemaakt voor " + role.name + ", " + nSkip + " hadden al een kanaal.").catch(errorHandler);
                     else
-                        u.send('Weet je zeker dat je ' + nDo + ' kanalen wil aanmaken? Typ dan **!zelforganisatie createAll IAmVerySure**').catch(errorHandler);
+                        u.send('Weet je zeker dat je ' + nDo + ' kanalen wil aanmaken? Typ dan `!zelforganisatie createAll IAmVerySure` in de server.').catch(errorHandler);
                 });
             }
 
