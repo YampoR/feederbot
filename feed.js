@@ -327,6 +327,7 @@ let Zelforganisatie = {
                 let channel = g.channels.get(channelId);
                 if (a.length == 1 && a[0] == 'IAmVerySure') {
                     Zelforganisatie.Database.deleteUserChannel(u.id, () => {
+                         await channel.delete().catch(errorCatcher()); 
                          Zelforganisatie.createChannel(m.member);
                          u.send('Je kanaal is gereset.').catch(errorCatcher());
                     });
@@ -562,8 +563,10 @@ let Zelforganisatie = {
                 .replace('{username}', member.displayName)
             )
             .catch(errorCatcher());
-
-            Zelforganisatie.Database.setUserChannel(member.id, ch.id, callback);
+            Zelforganisatie.Database.setUserChannel(member.id, ch.id, function() {
+                await Zelforganisatie.setDefaultPermissions(ch);
+                callback();
+            });
         }).catch(errorCatcher());
     },
 
