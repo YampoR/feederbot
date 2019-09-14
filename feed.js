@@ -51,7 +51,7 @@ const Configuration = {
         Enabled: true,
         RequiredRoleId: '506183228206481428',
         PublicAccessRoleId: '618406903738925056',
-        RequiredPermissionsBaseChannelId: '618378693202673664',
+        RequiredPermissionsBaseChannelId: '622481956780900364',
         PublicAccessIcons: {
             true: ':white_circle:',
             false: ':red_circle:'
@@ -325,7 +325,7 @@ let Zelforganisatie = {
                     return true;
                 }
                 let channel = g.channels.get(channelId);
-                if (a.length == 1 && a[1] == 'IAmVerySure') {
+                if (a.length == 1 && a[0] == 'IAmVerySure') {
                     Zelforganisatie.Database.deleteUserChannel(u.id, () => {
                          Zelforganisatie.createChannel(m.member);
                          u.send('Je kanaal is gereset.').catch(errorHandler);
@@ -504,7 +504,7 @@ let Zelforganisatie = {
             for (perm in denied.serialize())
                 perms[perm] = false;
 
-            ch.overwritePermissions(entry[0], perms);
+            await ch.overwritePermissions(entry[0], perms).catch(errorHandler);
         }
 
         // Remove illegal permission overwrites
