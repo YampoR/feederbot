@@ -522,7 +522,7 @@ let Zelforganisatie = {
         delete Zelforganisatie.updatingChannels[ch.id];
     },
 
-    createChannel(member, callback) {
+    async createChannel(member, callback) {
         let newChannelName = member.user.username.toLowerCase().replace(/[^a-z]+/g, '-');
         let parentId = -1;
         for (let categoryId of Configuration.Zelforganisatie.CategoryIds) {
@@ -537,7 +537,7 @@ let Zelforganisatie = {
             return;
         }
 
-        member.guild.createChannel(newChannelName, {
+        let ch = await member.guild.createChannel(newChannelName, {
             type: 'TEXT',
             parent: parentId,
             permissionOverwrites: [
@@ -556,18 +556,18 @@ let Zelforganisatie = {
                     deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
                 }
             ]
-        }).then(function(ch) {
-            ch.send(
-                Configuration.Zelforganisatie.WelcomeMessage
-                .replace('{mention}', '<@' + member.user.id + '>')
-                .replace('{username}', member.displayName)
-            )
-            .catch(errorCatcher());
-            Zelforganisatie.Database.setUserChannel(member.id, ch.id, function() {
-                await Zelforganisatie.setDefaultPermissions(ch);
-                callback();
-            });
         }).catch(errorCatcher());
+        
+        ch.send(
+            Configuration.Zelforganisatie.WelcomeMessage
+            .replace('{mention}', '<@' + member.user.id + '>')
+            .replace('{username}', member.displayName)
+        ).catch(errorCatcher());
+        
+        Zelforganisatie.Database.setUserChannel(member.id, ch.id, async function() {
+            await Zelforganisatie.setDefaultPermissions(ch);
+            callback();
+        });
     },
 
     Database: {
