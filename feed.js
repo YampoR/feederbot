@@ -318,20 +318,23 @@ let Zelforganisatie = {
             });
             return true;
         });
-        // commands.addCommand('reset', (g, u, c, a, m) => {
-            // Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
-                // if (typeof channelId == 'undefined') {
-                    // u.send('Je hebt geen eigen kanaal waar je mensen aan toe kunt voegen.').catch(errorHandler);
-                    // return true;
-                // }
-                // let channel = g.channels.get(channelId);
-                // if (a.length == 1 && a[1] == 'IAmVerySure') {
-
-                // } else
-                    // u.send('Typ !reset IAmVerySure om je kanaal te resetten.').catch(errorHandler);
-                // return true;
-            // });
-        // });
+        commands.addCommand('reset', (g, u, c, a, m) => {
+            Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
+                if (typeof channelId == 'undefined') {
+                    u.send('Je hebt geen eigen kanaal wat je kunt resetten.').catch(errorHandler);
+                    return true;
+                }
+                let channel = g.channels.get(channelId);
+                if (a.length == 1 && a[1] == 'IAmVerySure') {
+                    Zelforganisatie.Database.deleteUserChannel(u.id, () => {
+                         Zelforganisatie.createChannel(m.member);
+                         u.send('Je kanaal is gereset.').catch(errorHandler);
+                    });
+                } else
+                    u.send('Typ `!reset IAmVerySure` om je kanaal ' + channel + ' te resetten.').catch(errorHandler);
+                return true;
+            });
+        });
         commands.addCommand('zelforganisatie', (g, u, c, a, m) => {
             let subcommand = a.shift();
             if (!isBotAdmin(u))
@@ -515,7 +518,7 @@ let Zelforganisatie = {
         delete Zelforganisatie.updatingChannels[ch.id];
     },
 
-    createChannel(member) {
+    createChannel(member, callback) {
         let newChannelName = member.user.username.toLowerCase().replace(/[^a-z]+/g, '-');
         let parentId = -1;
         for (let categoryId of Configuration.Zelforganisatie.CategoryIds) {
@@ -557,33 +560,36 @@ let Zelforganisatie = {
             )
             .catch(errorHandler);
 
-            Zelforganisatie.Database.setUserChannel(member.id, ch.id);
+            Zelforganisatie.Database.setUserChannel(member.id, ch.id, callback);
         }).catch(errorHandler);
     },
 
     Database: {
-        setUserChannel(userId, channelId) {
-            request.post(Configuration.Zelforganisatie.ApiUrl + '/save_channel.php', {
+        setUserChannel(userId, channelId, callback) {
+            request.post({
+                uri: Configuration.Zelforganisatie.ApiUrl + '/save_channel.php',
                 form: { 'user': userId, 'channel': channelId }
-            });
+            }, callback);
         },
 
         getUserChannel(userId, callback) {
             request.get(Configuration.Zelforganisatie.ApiUrl + '/channels.json', function(e, s, b) {
                 callback(JSON.parse(b)[userId]);
-            });
+            }, callback);
         },
 
-        deleteUserChannel(userId) {
-            request.post(Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php', {
+        deleteUserChannel(userId, callback) {
+            request.post({
+                uri: Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php',
                 form: { 'user': userId }
-            });
+            }, callback);
         },
 
-        deleteChannel(channelId) {
-            request.post(Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php', {
+        deleteChannel(channelId, callback) {
+            request.post({
+                uri: Configuration.Zelforganisatie.ApiUrl + '/delete_channel.php',
                 form: { 'channel': channelId }
-            });
+            }, callback);
         },
 
         userHasChannel(userId, callback) {
