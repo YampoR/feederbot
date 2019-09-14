@@ -424,7 +424,11 @@ let Zelforganisatie = {
                     let nSkip = 0;
                     let nDo = 0;
                     let doIt = a.length == 1 && a[0] == 'IAmVerySure';
-                    let role = g.roles.get(Configuration.RequiredRoleId);
+                    let role = g.roles.get(Configuration.Zelforganisatie.RequiredRoleId);
+                    if (typeof role == 'undefined') {
+                        errorHandler('Cannot find role ID ' + Configuration.Zelforganisatie.RequiredRoleId);
+                        return;
+                    }
                     for(let member of role.members.array()) {
                         // Create channel for members without channel
                         if (userIDs.indexOf(member.user.id) > -1) {
