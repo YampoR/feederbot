@@ -500,13 +500,17 @@ let Zelforganisatie = {
         for(let entry of exampleChannel.permissionOverwrites.entries()) {
             let allowed = new Discord.Permissions(entry[1].allow);
             let denied = new Discord.Permissions(entry[1].deny);
+            let allowedS = allowed.serialize();
+            let deniedS = denied.serialize();
             let perms = {};
             for (perm in Discord.Permissions.FLAGS)
                 perms[perm] = null;
-            for (perm in allowed.serialize())
-                perms[perm] = true;
-            for (perm in denied.serialize())
-                perms[perm] = false;
+            for (perm in allowedS)
+                if (allowedS[perm])
+                    perms[perm] = true;
+            for (perm in deniedS)
+                if (deniedS[perm])
+                    perms[perm] = false;
 
             await ch.overwritePermissions(entry[0], perms).catch(errorCatcher());
         }
