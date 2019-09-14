@@ -418,13 +418,14 @@ let Zelforganisatie = {
                 return true;
             }
             
+            // !zelforganistatie createAll
             if (subcommand == 'createAll') {
                 Zelforganisatie.Database.getUsers(async function(userIDs) {
                     let nSkip = 0;
                     let nDo = 0;
                     let doIt = a.length == 1 && a[0] == 'IAmVerySure';
-                    let role = guild.roles.get(KameraadRoleId);
-                    for(member of role.members.array()) {
+                    let role = g.roles.get(Configuratie.RequiredRoleId);
+                    for(let member of role.members.array()) {
                         // Create channel for members without channel
                         if (userIDs.indexOf(member.user.id) > -1) {
                             nSkip++;
