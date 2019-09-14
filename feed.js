@@ -51,7 +51,7 @@ const Configuration = {
         Enabled: true,
         RequiredRoleId: '506183228206481428',
         PublicAccessRoleId: '618406903738925056',
-        RequiredPermissionsBaseChannelId: '622481956780900364',
+        RequiredPermissionsBaseChannelId: '622487072791592970',
         PublicAccessIcons: {
             true: ':white_circle:',
             false: ':red_circle:'
@@ -62,15 +62,15 @@ const Configuration = {
         ],
         BannedOverwriteIds: [
             '506183228206481428', // Kameraden
-            '600343301266210816', // Teller bot
-            '621446162200789013', // Teller rol
-            '547473949613621320', // Roller bot
-            '621448632629067779', // Roller rol
+            '600343301266210816', // Teller rol
+            '159985870458322944', // Teller bot
+            '547473949613621320', // Roller rol
+            '275813801792634880', // Roller bot
             '507953128822407169', // Bots
             '506859867508572171', // Burgerwacht
             '511945889502461964', // Conservatieven
-            '621446143812960277', // Liberalen
-            '621446162200789013', // Brocialisten
+            '618749326566490112', // Liberalen
+            '622494726599213071', // Brocialisten
 
         ],
         WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toevoegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
@@ -98,7 +98,7 @@ let Patcher = {
 
             if (channel.messages.has(data.message_id)) return;
 
-            const message = await channel.fetchMessage(data.message_id).catch(errorHandler);
+            const message = await channel.fetchMessage(data.message_id).catch(errorCatcher());
             const emojiKey = (data.emoji.id) ? `${data.emoji.name}:${data.emoji.id}` : data.emoji.name;
             let reaction = message.reactions.get(emojiKey);
 
@@ -146,19 +146,18 @@ let Feed = {
             let feedChannelId = Configuration.Feed.Channels[reaction.emoji.name];
             let feedChannel = message.guild.channels.get(feedChannelId);
             if (typeof feedChannel == 'undefined') {
-                errorHandler('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
+                errorCatcher()('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
                 return;
             }
 
-            message.react(reaction.emoji).catch(errorHandler);
-            reaction.remove(user).catch(errorHandler);
+            message.react(reaction.emoji).catch(errorCatcher());
+            reaction.remove(user).catch(errorCatcher());
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
                 .setTitle('Bericht in #' + channel.name + ' verstuurd door ' + user.username);
 
-            feedChannel.send(message.url, embed).catch(errorHandler);
-            errorHandler('Verstuurd door ' + message.author + ' in ' + message.channel);
+            feedChannel.send(message.url, embed).catch(errorCatcher());
         });
     }
 
@@ -231,7 +230,7 @@ let Zelforganisatie = {
         commands.addCommand('add', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je kunt kameraden alleen toevoegen aan je eigen kanaal.').catch(errorHandler);
+                    u.send('Je kunt kameraden alleen toevoegen aan je eigen kanaal.').catch(errorCatcher());
                     return true;
                 }
                 let channel = g.channels.get(channelId);
@@ -244,7 +243,7 @@ let Zelforganisatie = {
                 } else if (typeof addRole != 'undefined') {
                     overwriteId = addRole.id;
                 } else {
-                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker of ' + Configuration.Commands.Prefix + 'add @rol').catch(errorHandler);
+                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'add @gebruiker of ' + Configuration.Commands.Prefix + 'add @rol').catch(errorCatcher());
                     return true;
                 }
                 
@@ -260,14 +259,14 @@ let Zelforganisatie = {
                     'MANAGE_WEBHOOKS': false,
                     'CREATE_INSTANT_INVITE': false
                 });
-                u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorHandler);
+                u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorCatcher());
                 return true;
             });
         });
         commands.addCommand('remove', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je kunt kameraden alleen verwijderen uit je eigen kanaal.').catch(errorHandler);
+                    u.send('Je kunt kameraden alleen verwijderen uit je eigen kanaal.').catch(errorCatcher());
                     return true;
                 }
                 let channel = g.channels.get(channelId);
@@ -280,29 +279,29 @@ let Zelforganisatie = {
                 } else if (typeof removeRole != 'undefined') {
                     overwriteId = removeRole.id;
                 } else {
-                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'remove @gebruiker of ' + Configuration.Commands.Prefix + 'remove @rol').catch(errorHandler);
+                    u.send('Het commando is: ' + Configuration.Commands.Prefix + 'remove @gebruiker of ' + Configuration.Commands.Prefix + 'remove @rol').catch(errorCatcher());
                     return true;
                 }
                 
                 channel.overwritePermissions(overwriteId, {
                     'VIEW_CHANNEL': false,
                     'SEND_MESSAGES': false
-                }).catch(errorHandler);
-                u.send('Je hebt ' + removeMember + ' verwijderd uit ' + channel).catch(errorHandler);
+                }).catch(errorCatcher());
+                u.send('Je hebt ' + removeMember + ' verwijderd uit ' + channel).catch(errorCatcher());
                 return true;
             });
         });
         commands.addCommand('leave', (g, u, c, a, m) => {
             let channel = m.mentions.channels.first();
             if (typeof channel == 'undefined') {
-                u.send('Gebruik: !leave #kanaal').catch(errorHandler);
+                u.send('Gebruik: !leave #kanaal').catch(errorCatcher());
                 return true;
             }
             Zelforganisatie.Database.getChannels((channels) => {
                 console.log(channels);
                 for(userId in channels) {
                     if (userId == u.id) {
-                        u.send('Je kunt je eigen kanaal ' + channel + ' niet verlaten.').catch(errorHandler);
+                        u.send('Je kunt je eigen kanaal ' + channel + ' niet verlaten.').catch(errorCatcher());
                         return;
                     }
                     let channelId = channels[userId];
@@ -310,28 +309,28 @@ let Zelforganisatie = {
                         channel.overwritePermissions(u.id, {
                             'VIEW_CHANNEL': false
                         });
-                        u.send('Je hebt het kanaal ' + channel + ' verlaten.').catch(errorHandler);
+                        u.send('Je hebt het kanaal ' + channel + ' verlaten.').catch(errorCatcher());
                         return;
                     }
                 }
-                u.send('Je kunt het kanaal ' + channel + ' niet verlaten.').catch(errorHandler);
+                u.send('Je kunt het kanaal ' + channel + ' niet verlaten.').catch(errorCatcher());
             });
             return true;
         });
         commands.addCommand('reset', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je hebt geen eigen kanaal wat je kunt resetten.').catch(errorHandler);
+                    u.send('Je hebt geen eigen kanaal wat je kunt resetten.').catch(errorCatcher());
                     return true;
                 }
                 let channel = g.channels.get(channelId);
                 if (a.length == 1 && a[0] == 'IAmVerySure') {
                     Zelforganisatie.Database.deleteUserChannel(u.id, () => {
                          Zelforganisatie.createChannel(m.member);
-                         u.send('Je kanaal is gereset.').catch(errorHandler);
+                         u.send('Je kanaal is gereset.').catch(errorCatcher());
                     });
                 } else
-                    u.send('Typ `!reset IAmVerySure` om je kanaal ' + channel + ' te resetten.').catch(errorHandler);
+                    u.send('Typ `!reset IAmVerySure` om je kanaal ' + channel + ' te resetten.').catch(errorCatcher());
                 return true;
             });
         });
@@ -349,7 +348,7 @@ let Zelforganisatie = {
                     '- !zelforganisatie assign memberId kanaalId: Gebruiker eigenaar van kanaal maken\n' +
                     '- !zelforganisatie whois #kanaal: Eigenaar van kanaal weergeven\n' +
                     '- !zelforganisatie cleanup: Database opschonen'
-                ).catch(errorHandler);
+                ).catch(errorCatcher());
                 return true;
             }
 
@@ -369,19 +368,19 @@ let Zelforganisatie = {
             // !zelforganisatie whois
             if (subcommand == 'whois') {
                 if (a.length != 1) {
-                    u.send('Syntax: !zelforganisatie whois #kanaal').catch(errorHandler);
+                    u.send('Syntax: !zelforganisatie whois #kanaal').catch(errorCatcher());
                     return true;
                 }
                 let channel = m.mentions.channels.first();
                 if (typeof channel == 'undefined') {
-                    u.send('Kanaal niet gevonden').catch(errorHandler);
+                    u.send('Kanaal niet gevonden').catch(errorCatcher());
                     return true;
                 } 
                 Zelforganisatie.Database.getChannels((channels) => {
                     for(let userId in channels) {
                         let channelId = channels[userId];
                         if (channelId == channel.id) {
-                            u.send('Kanaal ' + channel + ' is van ' + g.members.get(userId)).catch(errorHandler);
+                            u.send('Kanaal ' + channel + ' is van ' + g.members.get(userId)).catch(errorCatcher());
                             break;
                         }
                     }
@@ -404,8 +403,8 @@ let Zelforganisatie = {
                             }
                             continue;
                         }
-                        u.send('Cleaned up ' + nCleanupM + ' members, ' + nCleanupC + ' channels').catch(errorHandler);
-                    }).catch(errorHandler);
+                        u.send('Cleaned up ' + nCleanupM + ' members, ' + nCleanupC + ' channels').catch(errorCatcher());
+                    }).catch(errorCatcher());
                 });
                 return true;
             }
@@ -429,7 +428,7 @@ let Zelforganisatie = {
                     let doIt = a.length == 1 && a[0] == 'IAmVerySure';
                     let role = g.roles.get(Configuration.Zelforganisatie.RequiredRoleId);
                     if (typeof role == 'undefined') {
-                        errorHandler('Cannot find role ID ' + Configuration.Zelforganisatie.RequiredRoleId);
+                        errorCatcher()('Cannot find role ID ' + Configuration.Zelforganisatie.RequiredRoleId);
                         return;
                     }
                     for(let member of role.members.array()) {
@@ -443,9 +442,9 @@ let Zelforganisatie = {
                             await Zelforganisatie.createChannel(member);
                     }
                     if (doIt)
-                        u.send(nDo + " kanalen aangemaakt voor " + role.name + ", " + nSkip + " hadden al een kanaal.").catch(errorHandler);
+                        u.send(nDo + " kanalen aangemaakt voor " + role.name + ", " + nSkip + " hadden al een kanaal.").catch(errorCatcher());
                     else
-                        u.send('Weet je zeker dat je ' + nDo + ' kanalen wil aanmaken? Typ dan `!zelforganisatie createAll IAmVerySure` in de server.').catch(errorHandler);
+                        u.send('Weet je zeker dat je ' + nDo + ' kanalen wil aanmaken? Typ dan `!zelforganisatie createAll IAmVerySure` in de server.').catch(errorCatcher());
                 });
             }
 
@@ -467,12 +466,12 @@ let Zelforganisatie = {
                             buf += Configuration.Zelforganisatie.PublicAccessIcons[channelPublic] +
                                 member + ': ' + channel + "\n";
                             if (buf.length > 1800) {
-                                u.send(buf).catch(errorHandler);
+                                u.send(buf).catch(errorCatcher());
                                 buf = '';
                             }
                         }
-                        u.send(buf).catch(errorHandler);
-                    }).catch(errorHandler);
+                        u.send(buf).catch(errorCatcher());
+                    }).catch(errorCatcher());
                 });
             }
 
@@ -484,6 +483,9 @@ let Zelforganisatie = {
         if (!ch.parent || !(Configuration.Zelforganisatie.CategoryIds.indexOf(ch.parent.id) > -1))
             return;
 
+        if (ch.id == Configuration.Zelforganisatie.RequiredPermissionsBaseChannelId)
+            return;
+        
         if (Zelforganisatie.updatingChannels[ch.id])
             return;
 
@@ -504,13 +506,13 @@ let Zelforganisatie = {
             for (perm in denied.serialize())
                 perms[perm] = false;
 
-            await ch.overwritePermissions(entry[0], perms).catch(errorHandler);
+            await ch.overwritePermissions(entry[0], perms).catch(errorCatcher());
         }
 
         // Remove illegal permission overwrites
         for (let id of Configuration.Zelforganisatie.BannedOverwriteIds) {
             if (ch.permissionOverwrites.has(id)) {
-                await ch.permissionOverwrites.get(id).delete().catch(errorHandler);
+                await ch.permissionOverwrites.get(id).delete().catch(errorCatcher());
             }
         }
 
@@ -529,7 +531,7 @@ let Zelforganisatie = {
             }
         }
         if (parentId == -1) {
-            errorHandler('Could not find Zelforganisatie category with less than 50 channels for ' + member);
+            errorCatcher()('Could not find Zelforganisatie category with less than 50 channels for ' + member);
             return;
         }
 
@@ -558,10 +560,10 @@ let Zelforganisatie = {
                 .replace('{mention}', '<@' + member.user.id + '>')
                 .replace('{username}', member.displayName)
             )
-            .catch(errorHandler);
+            .catch(errorCatcher());
 
             Zelforganisatie.Database.setUserChannel(member.id, ch.id, callback);
-        }).catch(errorHandler);
+        }).catch(errorCatcher());
     },
 
     Database: {
@@ -646,8 +648,8 @@ let MessageRestrictions = {
                         .replace('{length}', message.content.length)
                         .replace('{channel}', message.channel);
             }
-            message.author.send(messageBuffer).catch(errorHandler);
-            message.delete().catch(errorHandler);
+            message.author.send(messageBuffer).catch(errorCatcher());
+            message.delete().catch(errorCatcher());
         });
     }
 }
@@ -656,26 +658,30 @@ function isBotAdmin(member) {
     return member.hasPermission('MANAGE_GUILD') || Configuration.General.Developers.indexOf(member.user.id) > -1;
 }
 
-function errorHandler() {
-    if (!Configuration.General.LogChannelId) {
-        console.log(arguments);
-        return;
-    }
-
-    let ch = client.channels.get(Configuration.General.LogChannelId);
-    if (typeof ch == 'undefined') {
-        console.log('COULD NOT FIND LOG CHANNEL');
-        console.log.apply(console, arguments);
-        console.log(new Error().stack);
-        return;
-    }
-    ch.send('Console output @ ' + new Date().toUTCString() + ':\n```' + JSON.stringify(Array.from(arguments)) + '```\nat```'+(new Error().stack)+'```').catch(console.log);
-    console.log.apply(console, arguments);
-    console.log(new Error().stack);
+function errorCatcher() {
+    let stack = new Error().stack;
+    return function() {
+        let arrayArgs = Array.from(arguments);
+        arrayArgs.push(stack);
+        if (Configuration.General.LogChannelId) {
+            let ch = client.channels.get(Configuration.General.LogChannelId);
+            if (typeof ch != 'undefined') {
+                ch.send(
+                    'Console output @ ' + new Date().toUTCString() + ':\n```' + 
+                    JSON.stringify(Array.from(arguments)) +
+                    '```\nat```'+stack+'```'
+                ).catch(console.log);
+            } else {
+                Configuration.General.LogChannelId = false;
+                console.log('Error: could not find Log Channel, disabling.');            
+            }
+        }
+        console.log.apply(console, arrayArgs);
+    };
 }
 
 client.once("ready", () => {
-  errorHandler(`Logged in as ${client.user.tag}. version 3.0.0!`);
+  errorCatcher()(`Logged in as ${client.user.tag}. version 3.0.0!`);
 });
 
 // Enable modules
