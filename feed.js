@@ -12,17 +12,25 @@ const Configuration = {
 
     Feed: {
         Enabled: true,
-        Channels: {
-            '\u26AA': '562042082408005642', // :white_circle: -> #feed
-            '\uD83D\uDD34': '508676723273891840' // :red_circle: -> #burgerwacht
-        },
-        AllowOwnMessages: false,
-        BlockedChannels: [
-            '527123966020550666', // #theorie
-            '618226503347470336', // Zelforganisatie I
-            '616400159483363338', // Zelforganisatie II
-            '513002607439118336', // #polemiek / #oranje
-        ]
+        Feeds: {
+            // :white_circle:
+            '\u26AA': {
+                ChannelId: '562042082408005642', // #feed
+                AllowOwnMessages: false,
+                BlockedChannels: [
+                    '527123966020550666', // #theorie
+                    '618226503347470336', // Zelforganisatie I
+                    '616400159483363338', // Zelforganisatie II
+                    '513002607439118336', // #polemiek / #oranje
+                ]
+            },
+            // :red_circle:
+            '\uD83D\uDD34': {
+                ChannelId: '508676723273891840', // #burgerwacht
+                AllowOwnMessages: true,
+                BlockedChannels: []
+            }
+        }
     },
 
     MessageRestrictions: {
@@ -72,8 +80,25 @@ const Configuration = {
             '511945889502461964', // Conservatieven
             '618749326566490112', // Liberalen
             '622494726599213071', // Brocialisten
-
         ],
+        DefaultPermissions: {
+            Everyone: {
+                Allow: [],
+                Deny: ['MANAGE_MESSAGES', 'MANAGE_WEBHOOKS', 'SEND_TTS_MESSAGES', 'MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_CHANNELS', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'ADD_REACTIONS']
+            },
+            Bot: {
+                Allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
+                Deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
+            },
+            Owner: {
+                Allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
+                Deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_WEBHOOKS']
+            },
+            Guest: {
+                Allow: ['VIEW_CHANNEL', 'SEND_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'READ_MESSAGE_HISTORY'],
+                Deny: ['MENTION_EVERYONE', 'MANAGE_WEBHOOKS', 'CREATE_INSTANT_INVITE']
+            }
+        },
         WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toevoegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
     }
 }
@@ -100,6 +125,10 @@ let Patcher = {
             if (channel.messages.has(data.message_id)) return;
 
             const message = await channel.fetchMessage(data.message_id).catch(errorCatcher());
+            if (typeof message == 'undefined') {
+                errorCatcher()('Reaction on nonexistent message #' + data.message_id);
+                return;
+            }
             const emojiKey = (data.emoji.id) ? `${data.emoji.name}:${data.emoji.id}` : data.emoji.name;
             let reaction = message.reactions.get(emojiKey);
 
@@ -131,20 +160,22 @@ let Feed = {
             if (user.id == client.user.id)
                 return;
 
+            // Check if reaction means anything
+            if (!(reaction.emoji.name in Configuration.Feed.Feeds))
+                return;
+            
+            let feedOptions = Configuration.Feed.Feeds[reaction.emoji.name];
+            
             // Blocked channels & categories
-            if (Configuration.Feed.BlockedChannels.indexOf(channel.id) > -1
-             || (channel.parent && Configuration.Feed.BlockedChannels.indexOf(channel.parent.id) > -1))
+            if (feedOptions.BlockedChannels.indexOf(channel.id) > -1
+             || (channel.parent && feedOptions.BlockedChannels.indexOf(channel.parent.id) > -1))
                 return;
 
             // If blocked, Don't FEED your own messages
-            if (!Configuration.Feed.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
+            if (!feedOptions.AllowOwnMessages && (user.id == message.author.id && !isBotAdmin(message.guild.members.get(user.id))))
                 return;
 
-            // Check if reaction means anything
-            if (!(reaction.emoji.name in Configuration.Feed.Channels))
-                return;
-
-            let feedChannelId = Configuration.Feed.Channels[reaction.emoji.name];
+            let feedChannelId = feedOptions.ChannelId;
             let feedChannel = message.guild.channels.get(feedChannelId);
             if (typeof feedChannel == 'undefined') {
                 errorCatcher()('Feed channel for ' + reaction.emoji.name + ' invalid (#' + feedChannelId + ')');
@@ -248,18 +279,13 @@ let Zelforganisatie = {
                     return true;
                 }
                 
-                channel.overwritePermissions(overwriteId, {
-                    'VIEW_CHANNEL': true,
-                    'SEND_MESSAGES': true,
-                    'EMBED_LINKS': true,
-                    'ATTACH_FILES': true,
-                    'USE_EXTERNAL_EMOJIS': true,
-                    'ADD_REACTIONS': true,
-                    'READ_MESSAGE_HISTORY': true,
-                    'MENTION_EVERYONE': false,
-                    'MANAGE_WEBHOOKS': false,
-                    'CREATE_INSTANT_INVITE': false
-                });
+                let overwrite = {};
+                for(perm of Configuration.Zelforganisatie.DefaultPermissions.Guest.Allow)
+                    overwrite[perm] = true;
+                for(perm of Configuration.Zelforganisatie.DefaultPermissions.Guest.Deny)
+                    overwrite[perm] = false;
+                channel.overwritePermissions(overwriteId, overwrite);
+                
                 u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorCatcher());
                 return true;
             });
@@ -540,24 +566,25 @@ let Zelforganisatie = {
             errorCatcher()('Could not find Zelforganisatie category with less than 50 channels for ' + member);
             return;
         }
-
+        
         let ch = await member.guild.createChannel(newChannelName, {
             type: 'TEXT',
             parent: parentId,
             permissionOverwrites: [
                 {
                     id: member.guild.id,
-                    deny: ['MANAGE_MESSAGES', 'MANAGE_WEBHOOKS', 'SEND_TTS_MESSAGES', 'MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_CHANNELS', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_ROLES', 'USE_EXTERNAL_EMOJIS', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'ADD_REACTIONS']
+                    allow: Configuration.Zelforganisatie.DefaultPermissions.Everyone.Allow,
+                    deny: Configuration.Zelforganisatie.DefaultPermissions.Everyone.Deny
                 },
                 {
                     id: member.user.id,
-                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
-                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE', 'MANAGE_WEBHOOKS']
+                    allow: Configuration.Zelforganisatie.DefaultPermissions.Owner.Allow,
+                    deny: Configuration.Zelforganisatie.DefaultPermissions.Owner.Deny
                 },
                 {
                     id: member.guild.me.user.id,
-                    allow: ['MANAGE_CHANNELS', 'VIEW_CHANNEL', 'MANAGE_MESSAGES', 'SEND_MESSAGES', 'MANAGE_ROLES', 'ATTACH_FILES', 'EMBED_LINKS', 'READ_MESSAGE_HISTORY', 'USE_EXTERNAL_EMOJIS', 'ADD_REACTIONS', 'SEND_TTS_MESSAGES'],
-                    deny: ['MENTION_EVERYONE', 'CREATE_INSTANT_INVITE']
+                    allow: Configuration.Zelforganisatie.DefaultPermissions.Bot.Allow,
+                    deny: Configuration.Zelforganisatie.DefaultPermissions.Bot.Deny
                 }
             ]
         }).catch(errorCatcher());
@@ -603,7 +630,7 @@ let Zelforganisatie = {
         },
 
         userHasChannel(userId, callback) {
-            request.get(Configuration.Zelforganisatie.ApiUrl + '/has_channel.php?user=' + member.user.id, function(e, s, b) {
+            request.get(Configuration.Zelforganisatie.ApiUrl + '/has_channel.php?user=' + userId.id, function(e, s, b) {
                 callback(b.toUpperCase() == 'TRUE');
             });
         },
@@ -669,23 +696,23 @@ function isBotAdmin(member) {
 function errorCatcher() {
     let stack = new Error().stack;
     let firstNewLine = stack.indexOf('\n');
-    let toLine = firstNewLine;
+    let secondNewLine = stack.indexOf('\n', firstNewLine + 1);
+    let toLine = secondNewLine;
     for(let i = 0; i < Configuration.General.LogStackLines; i++) {
         let toLinePossible = stack.indexOf('\n', toLine + 1);
         if (toLinePossible == -1)
             break;
         toLine = toLinePossible;
     }
-    stack = stack.substring(firstNewLine + 1, toLine);
+    stack = stack.substring(secondNewLine + 1, toLine);
     return function() {
         let arrayArgs = Array.from(arguments);
-        arrayArgs.push(stack);
         if (Configuration.General.LogChannelId) {
             let ch = client.channels.get(Configuration.General.LogChannelId);
             if (typeof ch != 'undefined') {
                 ch.send(
                     'Console output @ ' + new Date().toUTCString() + ':\n```' + 
-                    JSON.stringify(Array.from(arguments)) +
+                    JSON.stringify(arrayArgs) +
                     '\n\n'+stack+'```'
                 ).catch(console.log);
             } else {
@@ -694,6 +721,7 @@ function errorCatcher() {
             }
         }
         console.log.apply(console, arrayArgs);
+        console.log(stack);
     };
 }
 
