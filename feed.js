@@ -99,7 +99,7 @@ const Configuration = {
                 Deny: ['MENTION_EVERYONE', 'MANAGE_WEBHOOKS', 'CREATE_INSTANT_INVITE']
             }
         },
-        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Je kunt mensen toevoegen met !add @persoon en verwijderen met !remove @persoon. Zie <#618422819298082829> voor meer informatie.'
+        WelcomeMessage: 'Welkom in je eigen kanaal, {username}. Deze commandos kan je hier typen: /n **Voeg toe aan jouw kanaal:** /n !add @[gebruikersnaam] *originele naam* /n !add @[rol] /n /n **Verwijder uit jouw kanaal:** /n !remove @[gebruikersnaam] /n !remove @[rol] /n/n **Een kanaal verlaten:**/n!leave #[kanaalnaam] /n *Zie <#618422819298082829> voor meer informatie.*'
     }
 }
 
