@@ -99,7 +99,7 @@ const Configuration = {
                 Deny: ['MENTION_EVERYONE', 'MANAGE_WEBHOOKS', 'CREATE_INSTANT_INVITE']
             }
         },
-        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *originele naam*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Solidariteit toevoegen**\n!add @zelforganisatie\n*Zie <#618422819298082829>*'
+        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *originele naam*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Solidariteit toevoegen**\n!add @[solidariteit]\n*Zie <#618422819298082829>*'
     }
 }
 
