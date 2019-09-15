@@ -286,14 +286,14 @@ let Zelforganisatie = {
                     overwrite[perm] = false;
                 channel.overwritePermissions(overwriteId, overwrite);
                 
-                u.send('Je hebt ' + addMember + ' toegevoegd aan ' + channel).catch(errorCatcher());
+                u.send('Je hebt ' + addMember + ' toegevoegd aan jouw kanaal' + channel).catch(errorCatcher());
                 return true;
             });
         });
         commands.addCommand('remove', (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je kunt kameraden alleen verwijderen uit je eigen kanaal.').catch(errorCatcher());
+                    u.send('Je kunt kameraden alleen verwijderen uit jouw eigen kanaal.').catch(errorCatcher());
                     return true;
                 }
                 let channel = g.channels.get(channelId);
@@ -314,7 +314,7 @@ let Zelforganisatie = {
                     'VIEW_CHANNEL': false,
                     'SEND_MESSAGES': false
                 }).catch(errorCatcher());
-                u.send('Je hebt ' + removeMember + ' verwijderd uit ' + channel).catch(errorCatcher());
+                u.send('Je hebt ' + removeMember + ' verwijderd uit jouw kanaal' + channel).catch(errorCatcher());
                 return true;
             });
         });
