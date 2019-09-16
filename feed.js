@@ -517,6 +517,12 @@ let Zelforganisatie = {
         if (Zelforganisatie.updatingChannels[ch.id])
             return;
 
+        let chPerms = ch.guild.me.permissionsIn(ch);
+        if (!chPerms.has('MANAGE_ROLES')) {
+            errorCatcher()('Feeder has no MANAGE_ROLES permission in Zelforganisatie channel #' + ch.id + ' (' + ch.name + ')');
+            return;
+        }
+        
         // Stop listening for this channel
         Zelforganisatie.updatingChannels[ch.id] = true;
 
