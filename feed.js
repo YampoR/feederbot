@@ -76,10 +76,8 @@ const Configuration = {
             '547473949613621320', // Roller rol
             '275813801792634880', // Roller bot
             '507953128822407169', // Bots
-            '506859867508572171', // Burgerwacht
-            '511945889502461964', // Conservatieven
+            '511945889502461964', // Reactionairen
             '618749326566490112', // Liberalen
-            '622494726599213071', // Brocialisten
         ],
         DefaultPermissions: {
             Everyone: {
@@ -99,7 +97,7 @@ const Configuration = {
                 Deny: ['MENTION_EVERYONE', 'MANAGE_WEBHOOKS', 'CREATE_INSTANT_INVITE']
             }
         },
-        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *originele naam*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Solidariteit toevoegen**\n!add @[solidariteit]\n*Zie <#618422819298082829>*'
+        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *originele naam*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Geïnteresseerden toevoegen**\n!add @[solidariteit]\n*Zie <#618422819298082829> voor meer*'
     }
 }
 
