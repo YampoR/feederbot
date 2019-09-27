@@ -350,7 +350,7 @@ let Zelforganisatie = {
         commands.addCommand('reset', async (g, u, c, a, m) => {
             Zelforganisatie.Database.getUserChannel(u.id, (channelId) => {
                 if (typeof channelId == 'undefined') {
-                    u.send('Je hebt geen eigen kanaal wat je kunt resetten.').catch(errorCatcher());
+                    u.send('Je kan alleen je eigen kanaal resetten.').catch(errorCatcher());
                     return true;
                 }
                 let channel = g.channels.get(channelId);
