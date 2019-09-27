@@ -181,12 +181,7 @@ let Feed = {
             }
 
             message.react(reaction.emoji).catch(errorCatcher());
-            let chPerms = ch.guild.me.permissionsIn(ch);
-            if (chPerms.has('MANAGE_MESSAGES')) {
-                reaction.remove(user).catch(errorCatcher());
-            } else {
-                errorCatcher()('Feeder has no MANAGE_MESSAGES permission channel #' + ch.id + ' (' + ch.name + '), can\'t remove feeder reactions.');
-            }
+            reaction.remove(user).catch(errorCatcher());
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
