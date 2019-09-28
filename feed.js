@@ -122,10 +122,14 @@ let Patcher = {
 
             if (channel.messages.has(data.message_id)) return;
 
-            const message = await channel.fetchMessage(data.message_id).catch(errorCatcher());
+            var err = null;
+            const message = await channel.fetchMessage(data.message_id).catch(function(){ err = arguments; });
             if (typeof message == 'undefined') {
-                errorCatcher()('Reaction on nonexistent message #' + data.message_id);
                 return;
+            }
+            if (err != null) {
+                let eh = errorCatcher();
+                eh.apply(eh, arguments);
             }
             const emojiKey = (data.emoji.id) ? `${data.emoji.name}:${data.emoji.id}` : data.emoji.name;
             let reaction = message.reactions.get(emojiKey);
@@ -180,14 +184,15 @@ let Feed = {
                 return;
             }
 
-            message.react(reaction.emoji).catch(errorCatcher());
-            reaction.remove(user).catch(errorCatcher());
             var embed = new Discord.RichEmbed()
                 .setAuthor(message.member.displayName, message.author.avatarURL)
                 .setDescription(message.content)
                 .setTitle('Bericht in #' + channel.name + ' verstuurd door ' + user.username);
 
             feedChannel.send(message.url, embed).catch(errorCatcher());
+            
+            message.react(reaction.emoji).catch(errorCatcher());
+            reaction.remove(user).catch(errorCatcher());
         });
     }
 
@@ -684,11 +689,11 @@ let MessageRestrictions = {
                     "\n" +
                     Configuration.MessageRestrictions.Messages.ListIcon +
                     Configuration.MessageRestrictions.Messages[violation]
-                        .replace('{length}', message.content.length)
-                        .replace('{channel}', message.channel);
+                        .replace('{length}', msg.content.length)
+                        .replace('{channel}', msg.channel);
             }
-            message.author.send(messageBuffer).catch(errorCatcher());
-            message.delete().catch(errorCatcher());
+            msg.author.send(messageBuffer).catch(errorCatcher());
+            msg.delete().catch(errorCatcher());
         });
     }
 }
