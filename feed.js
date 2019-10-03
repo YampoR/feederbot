@@ -36,7 +36,7 @@ const Configuration = {
     MessageRestrictions: {
         Enabled: true,
         Messages: {
-            MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
+            MessageDeleted: 'Ik heb je bericht in #theorie verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
             TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal. Als je bericht langer is, splits die dan in meerdere stukken.',
             TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal. Splits die op in meerdere stukken.',
@@ -45,7 +45,7 @@ const Configuration = {
         Channels: {
             // #theorie
             '527123966020550666': {
-                MinLength: 200,
+                MinLength: 100,
                 ExceptUrls: true
             }
         }
