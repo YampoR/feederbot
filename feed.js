@@ -36,10 +36,10 @@ const Configuration = {
     MessageRestrictions: {
         Enabled: true,
         Messages: {
-            MessageDeleted: 'Ik heb je bericht in #theorie verwijderd om de volgende reden(en):',
+            MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
-            TooShort: 'Je bericht is korter dan {length} tekens, de minimale lengte in dit kanaal. Als je bericht langer is, splits die dan in meerdere stukken.',
-            TooLong: 'Je bericht is langer dan {length} tekens, de maximale lengte in dit kanaal. Splits die op in meerdere stukken.',
+            TooShort: 'Je bericht is korter dan {minLength} tekens, de minimale lengte in dit kanaal.',
+            TooLong: 'Je bericht is langer dan {maxLength} tekens, de maximale lengte in dit kanaal. Splits je bericht op in meerdere stukken.',
             ContainsUrl: 'Je bericht bevat een link, wat niet toegestaan is in dit kanaal.'
         },
         Channels: {
@@ -665,6 +665,7 @@ let MessageRestrictions = {
     enable(client) {
         client.on('message', msg => {
             let restrictions = Configuration.MessageRestrictions.Channels[msg.channel.id];
+            errorCatcher()(restrictions);
             if (typeof restrictions == 'undefined')
                 return;
 
@@ -680,16 +681,17 @@ let MessageRestrictions = {
             if (restrictions.BlockUrls && msg.content.match(/https?:\/\//))
                 violations.push('ContainsUrl');
 
-            if (violations.lenght == 0)
+            if (violations.length == 0)
                 return;
 
             let messageBuffer = Configuration.MessageRestrictions.Messages.MessageDeleted;
-            for (violation of violations) {
+            for (let violation of violations) {
                 messageBuffer +=
                     "\n" +
                     Configuration.MessageRestrictions.Messages.ListIcon +
                     Configuration.MessageRestrictions.Messages[violation]
-                        .replace('{length}', msg.content.length)
+                        .replace('{minLength}', restrictions.MinLength)
+                        .replace('{maxLength}', restrictions.MaxLength)
                         .replace('{channel}', msg.channel);
             }
             msg.author.send(messageBuffer).catch(errorCatcher());
