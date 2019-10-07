@@ -328,7 +328,6 @@ let Zelforganisatie = {
                 return true;
             }
             Zelforganisatie.Database.getChannels((channels) => {
-                console.log(channels);
                 for(userId in channels) {
                     if (userId == u.id) {
                         u.send('Je kunt je eigen kanaal ' + channel + ' niet verlaten.').catch(errorCatcher());
@@ -665,7 +664,6 @@ let MessageRestrictions = {
     enable(client) {
         client.on('message', msg => {
             let restrictions = Configuration.MessageRestrictions.Channels[msg.channel.id];
-            errorCatcher()(restrictions);
             if (typeof restrictions == 'undefined')
                 return;
 
@@ -690,11 +688,12 @@ let MessageRestrictions = {
                     "\n" +
                     Configuration.MessageRestrictions.Messages.ListIcon +
                     Configuration.MessageRestrictions.Messages[violation]
-                        .replace('{minLength}', restrictions.MinLength)
-                        .replace('{maxLength}', restrictions.MaxLength)
-                        .replace('{channel}', msg.channel);
+                        .replace(/\{minLength\}/g, restrictions.MinLength)
+                        .replace(/\{maxLength\}/g, restrictions.MaxLength);
             }
-            msg.author.send(messageBuffer).catch(errorCatcher());
+            msg.author.send(
+                messageBuffer.replace(/\{channel\}/g, msg.channel)
+            ).catch(errorCatcher());
             msg.delete().catch(errorCatcher());
         });
     }
