@@ -61,6 +61,9 @@ const Configuration = {
         RequiredRoleId: '506183228206481428',
         PublicAccessRoleId: '618406903738925056',
         RequiredPermissionsBaseChannelId: '622487072791592970',
+        ExceptBasePermissionChannelIds: [ 
+            '513002607439118336'
+        ],
         PublicAccessIcons: {
             true: ':white_circle:',
             false: ':red_circle:'
@@ -514,6 +517,9 @@ let Zelforganisatie = {
             return;
 
         if (ch.id == Configuration.Zelforganisatie.RequiredPermissionsBaseChannelId)
+            return;
+        
+        if (Configuration.Zelforganisatie.ExceptBasePermissionChannelIds.indexOf(ch.id) > -1)
             return;
         
         if (Zelforganisatie.updatingChannels[ch.id])
