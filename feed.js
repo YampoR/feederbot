@@ -39,9 +39,9 @@ const Configuration = {
         Messages: {
             MessageDeleted: 'Ik heb je bericht in {channel} verwijderd om de volgende reden(en):',
             ListIcon: ':small_orange_diamond: ',
-            TooShort: 'Je bericht is korter dan {minLength} tekens, de minimale lengte in dit kanaal.',
+            TooShort: 'Je bericht moet minimaal 140 tekens zijn of een link.',
             TooLong: 'Je bericht is langer dan {maxLength} tekens, de maximale lengte in dit kanaal. Splits je bericht op in meerdere stukken.',
-            ContainsUrl: 'Je bericht bevat een link, wat niet toegestaan is in dit kanaal.'
+            ContainsUrl: '.'
         },
         Channels: {
             // #theorie
