@@ -46,7 +46,7 @@ const Configuration = {
         Channels: {
             // #theorie
             '527123966020550666': {
-                MinLength: 100,
+                MinLength: 140,
                 ExceptUrls: true
             }
         }
