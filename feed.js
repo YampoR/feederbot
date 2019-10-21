@@ -21,6 +21,7 @@ const Configuration = {
                     '527123966020550666', // #theorie
                     '618226503347470336', // Zelforganisatie I
                     '616400159483363338', // Zelforganisatie II
+                    '635924505499271208', // Zelforganisatie III
                     '513002607439118336', // #polemiek / #oranje
                 ]
             },
@@ -71,6 +72,7 @@ const Configuration = {
         CategoryIds: [
             '618226503347470336', // Zelforganisatie I
             '616400159483363338', // Zelforganisatie II
+            '635924505499271208', // Zelforganisatie III
         ],
         BannedOverwriteIds: [
             '506183228206481428', // Kameraden
