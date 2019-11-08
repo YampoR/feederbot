@@ -102,7 +102,7 @@ const Configuration = {
                 Deny: ['MENTION_EVERYONE', 'MANAGE_WEBHOOKS', 'CREATE_INSTANT_INVITE']
             }
         },
-        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *originele naam*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Geïnteresseerden toevoegen**\n!add @[solidariteit]\n*Zie https://imgur.com/a/yTif9Wa*'
+        WelcomeMessage: '**— — — — J O U W K A N A A L — — — —**\n\n**Voeg toe aan jouw kanaal**\n!add @[gebruikersnaam] *werkt momenteel niet op android*\n!add @[rol]\n\n**Verwijder uit jouw kanaal**\n!remove @[gebruikersnaam]\n!remove @[rol]\n\n**Een kanaal verlaten**\n!leave #[kanaalnaam]\n\n**Geïnteresseerden toevoegen**\n!add @[solidariteit]\n*Zie https://imgur.com/a/yTif9Wa*'
     }
 }
 
