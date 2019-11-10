@@ -57,7 +57,7 @@ const Configuration = {
     },
 
     Zelforganisatie: {
-        ApiUrl: 'https://www.hettuig.nl/bot',
+        ApiUrl: 'https://www.tuigvanderichel.net/bot',
         Enabled: true,
         RequiredRoleId: '506183228206481428',
         PublicAccessRoleId: '618406903738925056',
