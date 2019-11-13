@@ -2,7 +2,7 @@
 const Configuration = {
 
     General: {
-        BotToken: 'NjE5MjY3MzExMzQ1NDY3Mzky.XcxLRg.5m9LfTze7kVbOQLQtc2ldVxxy84',
+        BotToken: 'NTQ5MjEzNTY4NDg3MTI5MDk5.XcxNyg.1NbmSJrNvXFBaOJafPbrLOXkiSo',
         LogChannelId: '617405248587169798',
         LogStackLines: 5,
         Developers: [
