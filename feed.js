@@ -24,7 +24,6 @@ const Configuration = {
                     '635924505499271208', // Zelforganisatie III
                     '643939540477673482', // Zelforganisatie IV
                     '513002607439118336', // #polemiek / #oranje
-                    '643934136066899979', // Zelgorganisatiekanaal
                 ]
             },
             // :red_circle:
@@ -66,7 +65,6 @@ const Configuration = {
         RequiredPermissionsBaseChannelId: '622487072791592970',
         ExceptBasePermissionChannelIds: [ 
             '513002607439118336' // oranje
-            '643934136066899979' // Zelgorganisatiekanaal
         ],
         PublicAccessIcons: {
             true: ':white_circle:',
