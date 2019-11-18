@@ -1,6 +1,8 @@
 // Configuration
 const Configuration = {
 
+    TEST
+    
     General: {
         BotToken: process.env.DISCORD_KEY,
         LogChannelId: '617405248587169798',
