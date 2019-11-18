@@ -3,7 +3,7 @@ const Configuration = {
     
     General: {
         BotToken: process.env.DISCORD_KEY,
-        LogChannelId: '617405248587169798',
+        LogChannelId: '645958661541199885',
         LogStackLines: 5,
         Developers: [
             '146312749146701824' // @Xesau#1681
