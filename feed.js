@@ -1,7 +1,5 @@
 // Configuration
 const Configuration = {
-
-    TEST2
     
     General: {
         BotToken: process.env.DISCORD_KEY,
