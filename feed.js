@@ -2,7 +2,7 @@
 const Configuration = {
 
     General: {
-        BotToken: 'NTQ5MjEzNTY4NDg3MTI5MDk5.XcxQRg.WzQEUFD8xh96L1X6DUBRB-HQ4w0',
+        BotToken: process.env.DISCORD_KEY,
         LogChannelId: '617405248587169798',
         LogStackLines: 5,
         Developers: [
